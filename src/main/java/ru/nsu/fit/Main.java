@@ -1,14 +1,18 @@
 package ru.nsu.fit;
 
 
+import ru.nsu.fit.dymock.BonfireBuilder;
+import ru.nsu.fit.dymock.Dymock;
+import ru.nsu.fit.dymock.Stick;
 import ru.nsu.fit.testclasses.SayHello;
 
-import java.lang.reflect.InvocationTargetException;
-
 public class Main {
-    public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        ChangeClass changer = new ChangeClass();
-        System.out.println(changer.change(SayHello.class, "sayHello").sayHello());
+    public static void main(String[] args) {
+        SayHello test = Dymock.burn(SayHello.class);
+        Object[] arguments = {};
+        BonfireBuilder.buildBonfire(test.getClass())
+                .addStick(new Stick("sayHello", arguments, "Mocked!"));
+        System.out.println(test.sayHello());
     }
 
 }

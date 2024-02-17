@@ -1,30 +1,28 @@
 package ru.nsu.fit.dymock;
 
+import net.bytebuddy.implementation.bind.annotation.*;
+
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class MockInterceptorByteBuddy implements MockInterceptor {
-    private final List<CallDetails> callDetails;
+public class MockInterceptorByteBuddy{
+    private final List<Stick> callDetails;
 
-    public MockInterceptorByteBuddy(List<CallDetails> callDetails) {
+    public MockInterceptorByteBuddy(List<Stick> callDetails) {
         this.callDetails = callDetails;
     }
-    @Override
-    public Object invoke(Object mock, Method invokedMethod, Object[] arguments) {
 
+    @RuntimeType
+    public Object invoke(@Origin Method invokedMethod,
+                         @AllArguments Object[] arguments) {
         String methodName = invokedMethod.getName();
-
-        CallDetails invocationDetails = new CallDetails(methodName, arguments, mock.getClass());
-
-        if (!callDetails.contains(invocationDetails)) {
-            callDetails.add(invocationDetails);
-            return invokedMethod.getDefaultValue();
-
-        } else {
-
-            CallDetails recordedBehaviour = callDetails.get(callDetails.indexOf(invocationDetails));
-            return recordedBehaviour.getResult();
+        System.out.println(methodName + " was involved");
+        Stick result = callDetails.stream().filter(stick -> stick.getMethodName()
+                .equals(methodName)).findAny().orElse(null);
+        if (result != null) {
+            return result.getResult();
 
         }
+        return invokedMethod.getDefaultValue();
     }
 }
