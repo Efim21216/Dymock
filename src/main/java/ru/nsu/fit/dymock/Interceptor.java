@@ -5,10 +5,10 @@ import net.bytebuddy.implementation.bind.annotation.*;
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class MockInterceptorByteBuddy{
+public class Interceptor {
     private final List<Stick> callDetails;
 
-    public MockInterceptorByteBuddy(List<Stick> callDetails) {
+    public Interceptor(List<Stick> callDetails) {
         this.callDetails = callDetails;
     }
 
@@ -21,8 +21,11 @@ public class MockInterceptorByteBuddy{
                 .equals(methodName)).findAny().orElse(null);
         if (result != null) {
             return result.getResult();
-
         }
         return invokedMethod.getDefaultValue();
+    }
+
+    public void addStick(Stick stick) {
+        callDetails.add(stick);
     }
 }

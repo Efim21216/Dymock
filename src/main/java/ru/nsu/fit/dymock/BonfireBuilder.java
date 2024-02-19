@@ -1,27 +1,18 @@
 package ru.nsu.fit.dymock;
 
 
-import java.util.List;
-
 public class BonfireBuilder {
-    private static List<Stick> sticks;
     public static Builder buildBonfire(Object mock) {
-        return new BonfireBuilder(). new Builder();
-    }
-
-    public static List<Stick> getSticks() {
-        return sticks;
-    }
-    public static void setSticks(List<Stick> s) {
-        sticks = s;
+        return new BonfireBuilder(). new Builder(mock);
     }
 
     public class Builder {
-        private Builder() {
-
+        private final Object current;
+        private Builder(Object mock) {
+            this.current = mock;
         }
-        public <R> Builder addStick(Stick stick) {
-            sticks.add(stick);
+        public Builder addStick(Stick stick) {
+            ((InterceptionAccessor) current).getInterceptor().addStick(stick);
             return this;
         }
     }
