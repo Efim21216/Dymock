@@ -12,8 +12,10 @@ public class Dymock {
         return null;
     }
     public static <T, R> Stick wetStick(Class<T> mockedClass, String methodName,
-                                     List<Leaf> matchers, R returnValue) {
+                                     List<Leaf> matchers, Throwable throwable) {
         return null;
     }
-    public static <T> void ignited() {}
+    public static <T> boolean ignited() {
+        return true;
+    }
 }
