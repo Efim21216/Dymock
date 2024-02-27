@@ -1,7 +1,6 @@
 package ru.nsu.fit.dymock;
 
 import net.bytebuddy.implementation.bind.annotation.*;
-import net.bytebuddy.implementation.bytecode.constant.ClassConstant;
 
 import java.lang.reflect.Method;
 import java.util.List;
