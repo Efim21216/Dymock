@@ -3,6 +3,7 @@ package ru.nsu.fit;
 
 import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
+import ru.nsu.fit.dymock.Leaf;
 import ru.nsu.fit.dymock.LeafMatcher;
 import ru.nsu.fit.dymock.Stick;
 import ru.nsu.fit.testclasses.SayHello;
@@ -13,9 +14,9 @@ public class Main {
         LeafMatcher[] zeroArg = {};
 
         Integer num = 2<<10;
-        LeafMatcher[] anyArg = {Dymock.green()};
-        LeafMatcher[] eqABC = {Dymock.yellow(num)};
-        LeafMatcher[] linkEqABC = {Dymock.red(num)};
+        LeafMatcher[] anyArg = {Leaf.green()};
+        LeafMatcher[] eqABC = {Leaf.yellow(num)};
+        LeafMatcher[] linkEqABC = {Leaf.red(num)};
         BonfireBuilder.buildBonfire(test)
                 .addStick(new Stick("sayHello", zeroArg, "Mocked!"))
                 .addStick(new Stick("returnInt", zeroArg, 42))
