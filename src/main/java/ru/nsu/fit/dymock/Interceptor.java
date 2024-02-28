@@ -3,13 +3,16 @@ package ru.nsu.fit.dymock;
 import net.bytebuddy.implementation.bind.annotation.*;
 
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Deque;
+import java.util.Spliterators;
+import java.util.stream.StreamSupport;
+
 import java.lang.reflect.Array;
 
 public class Interceptor {
-    private final List<Stick> callDetails;
+    private final Deque<Stick> callDetails;
 
-    public Interceptor(List<Stick> callDetails) {
+    public Interceptor(Deque<Stick> callDetails) {
         this.callDetails = callDetails;
     }
 
@@ -18,7 +21,7 @@ public class Interceptor {
                          @AllArguments Object[] arguments) {
         String methodName = invokedMethod.getName();
         System.out.println(methodName + " was involved");
-        Stick result = callDetails.stream()
+        Stick result = StreamSupport.stream(Spliterators.spliteratorUnknownSize(callDetails.descendingIterator(), 0), false)
                                     .filter(
                                         stick -> stick.getMethodName().equals(methodName) 
                                         && stick.matchesLeaves(arguments))

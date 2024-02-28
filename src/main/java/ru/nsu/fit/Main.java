@@ -15,14 +15,14 @@ public class Main {
 
         Integer num = 2<<10;
         LeafMatcher[] anyArg = {Leaf.green()};
-        LeafMatcher[] eqABC = {Leaf.yellow(num)};
-        LeafMatcher[] linkEqABC = {Leaf.red(num)};
+        LeafMatcher[] eqNum = {Leaf.yellow(num)};
+        LeafMatcher[] linkEqNum = {Leaf.red(num)};
         BonfireBuilder.buildBonfire(test)
                 .addStick(new Stick("sayHello", zeroArg, "Mocked!"))
                 .addStick(new Stick("returnInt", zeroArg, 42))
-                .addStick(new Stick("testArgs", linkEqABC, "THE NUM"))
-                .addStick(new Stick("testArgs", eqABC, "NUM"))
                 .addStick(new Stick("testArgs", anyArg, "ANY"))
+                .addStick(new Stick("testArgs", eqNum, "NUM"))
+                .addStick(new Stick("testArgs", linkEqNum, "THE NUM"))
                 .addStick(new Stick("testVoid", anyArg, null));
         System.out.println(test.sayHello());
         System.out.println(test.returnInt());

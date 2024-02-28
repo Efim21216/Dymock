@@ -7,8 +7,8 @@ import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
 import org.objenesis.ObjenesisStd;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
@@ -19,7 +19,7 @@ public class MockMakerByteBuddy implements MockMaker {
     @Override
     public <T> T createMock(Class<T> classToMock) {
         ByteBuddy byteBuddy = new ByteBuddy();
-        List<Stick> callMatchers = new LinkedList<>();
+        Deque<Stick> callMatchers = new ArrayDeque<>();
         Interceptor interceptor = new Interceptor(callMatchers);
         Class<? extends T> classWithInterceptor = byteBuddy.subclass(classToMock)
                 .method(not(isDeclaredBy(Object.class)))
