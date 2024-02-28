@@ -7,8 +7,8 @@ public class SayHello {
     public int returnInt() {
         return 1;
     }
-    public int testArgs(int a) {
-        return a;
+    public String testArgs(Integer a) {
+        return a + ";";
     }
     public void testVoid(int a) {
         System.out.println(a);

@@ -8,11 +8,11 @@ public class Dymock {
         return maker.createMock(classToMock);
     }
     public static <T, R> Stick stick(Class<T> mockedClass, String methodName,
-                                  List<Leaf> matchers, R returnValue) {
+                                  List<LeafMatcher> matchers, R returnValue) {
         return null;
     }
     public static <T, R> Stick wetStick(Class<T> mockedClass, String methodName,
-                                     List<Leaf> matchers, Throwable throwable) {
+                                     List<LeafMatcher> matchers, Throwable throwable) {
         return null;
     }
     public static <T> boolean ignited() {
