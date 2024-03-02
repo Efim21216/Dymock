@@ -12,7 +12,12 @@ public class BonfireBuilder {
             this.current = mock;
         }
         public Builder addStick(Stick stick) {
-            ((InterceptionAccessor) current).getInterceptor().addStick(stick);
+            if (current instanceof Intercepted) {
+                stick.setMethodName(((Intercepted) current).getFullName() + "." + stick.getMethodName() + "()");
+                StaticInterceptor.addRule(stick);
+            }
+            else
+                ((InterceptionAccessor) current).getInterceptor().addStick(stick);
             return this;
         }
     }

@@ -1,5 +1,8 @@
 package ru.nsu.fit.dymock;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Stick {
     private String methodName;
 
@@ -12,7 +15,6 @@ public class Stick {
         this.leaves = arguments;
         this.result = result;
     }
-
     public boolean matchesLeaves(Object[] arguments){
         if(arguments.length != leaves.length){
             return false;
@@ -34,4 +36,7 @@ public class Stick {
         return result;
     }
 
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
+    }
 }
