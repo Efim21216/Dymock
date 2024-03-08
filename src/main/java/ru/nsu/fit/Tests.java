@@ -1,22 +1,11 @@
 package ru.nsu.fit;
 
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.agent.ByteBuddyAgent;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.description.type.TypeDescription;
-import net.bytebuddy.dynamic.ClassFileLocator;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.dynamic.loading.ClassReloadingStrategy;
-import net.bytebuddy.implementation.FixedValue;
-import net.bytebuddy.implementation.MethodCall;
-import net.bytebuddy.pool.TypePool;
 import ru.nsu.fit.dymock.*;
+import ru.nsu.fit.dymock.bytebuddy.Intercepted;
+import ru.nsu.fit.dymock.matchers.Leaf;
+import ru.nsu.fit.dymock.matchers.LeafMatcher;
+import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.testclasses.*;
-
-import java.lang.instrument.Instrumentation;
-import java.util.concurrent.Callable;
-
-import static net.bytebuddy.matcher.ElementMatchers.named;
 
 public class Tests {
     /*public static void testRedefine() {
@@ -88,12 +77,13 @@ public class Tests {
         System.out.println(test.testArgs(2<<10)); // doesn't match by link
         System.out.println(test.testArgs(num)); // match by link
         test.testVoid(2);
+        Dymock.ignited(test);
     }
     public static void testStaticMock() {
         System.out.println("Original invocation");
         System.out.println(StaticSayHello.sayHello());
         System.out.println("Mocking class...");
-        Intercepted intercepted = Dymock.burnDown(StaticSayHello.class);
+        Intercepted<StaticSayHello> intercepted = Dymock.burnDown(StaticSayHello.class);
         LeafMatcher[] zeroArg = {};
         BonfireBuilder.buildBonfire(intercepted)
                         .addStick(new Stick("sayHello", zeroArg, 42))
@@ -101,5 +91,4 @@ public class Tests {
         System.out.println(StaticSayHello.sayHello());
         System.out.println(StaticSayHello.m());
     }
-
 }

@@ -1,4 +1,4 @@
-package ru.nsu.fit.dymock;
+package ru.nsu.fit.dymock.matchers;
 
 public class Leaf {
     private static Leaf INSTANCE = new Leaf();
