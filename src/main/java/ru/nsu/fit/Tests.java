@@ -69,6 +69,19 @@ public class Tests {
         System.out.println(test.testArgs(0.5)); // Hi double
     }
 
+    public static void testStaticOverload(){
+        Intercepted<StaticSayHello> intercepted = Dymock.burnDown(StaticSayHello.class);
+        LeafMatcher[] intArg = {Leaf.green(Integer.class)};
+        LeafMatcher[] dblArg = {Leaf.green(Double.class)};
+
+        BonfireBuilder.buildBonfire(intercepted)
+                .addStick(new Stick("testArgs", intArg, "Hi int!"))
+                .addStick(new Stick("testArgs", dblArg, "Hi double"));
+
+        System.out.println(StaticSayHello.testArgs(1)); // Hi int
+        System.out.println(StaticSayHello.testArgs(0.5)); // Hi double
+    }
+
     public static void testSimpleCase() {
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] zeroArg = {};
@@ -98,10 +111,21 @@ public class Tests {
         System.out.println("Mocking class...");
         Intercepted<StaticSayHello> intercepted = Dymock.burnDown(StaticSayHello.class);
         LeafMatcher[] zeroArg = {};
+
+        Integer num = 2<<10;
+        LeafMatcher[] anyArg = {Leaf.green(Integer.class)};
+        LeafMatcher[] eqNum = {Leaf.yellow(num, Integer.class)};
+        LeafMatcher[] linkEqNum = {Leaf.red(num, Integer.class)};
         BonfireBuilder.buildBonfire(intercepted)
                         .addStick(new Stick("sayHello", zeroArg, 42))
-                .addStick(new Stick("m", zeroArg, "Intercepted value"));
+                .addStick(new Stick("m", zeroArg, "Intercepted value"))
+                .addStick(new Stick("testArgs", anyArg, "ANY"))
+                .addStick(new Stick("testArgs", eqNum, "NUM"))
+                .addStick(new Stick("testArgs", linkEqNum, "THE NUM"));
         System.out.println(StaticSayHello.sayHello());
         System.out.println(StaticSayHello.m());
+        System.out.println(StaticSayHello.testArgs(1));
+        System.out.println(StaticSayHello.testArgs(2<<10));
+        System.out.println(StaticSayHello.testArgs(num)); // doesn't match
     }
 }
