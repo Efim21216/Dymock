@@ -62,7 +62,7 @@ public class Tests {
         LeafMatcher[] dblArg = {Leaf.green(Double.class)};
 
         BonfireBuilder.buildBonfire(test)
-                .addStick(new Stick("testArgs", intArg, "Hi int"))
+                .addStick(new Stick("testArgs", intArg, "Hi int!"))
                 .addStick(new Stick("testArgs", dblArg, "Hi double"));
 
         System.out.println(test.testArgs(1)); // Hi int
