@@ -1,8 +1,5 @@
 package ru.nsu.fit.dymock.matchers;
 
-
-import java.lang.reflect.Method;
-
 public class Stick {
     private String methodName;
 
