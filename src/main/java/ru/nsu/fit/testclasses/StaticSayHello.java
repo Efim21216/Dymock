@@ -8,4 +8,10 @@ public class StaticSayHello {
     public static String m() {
         return "Hello!";
     }
+    public static String testArgs(int a) {
+        return a + ";";
+    }
+    public static String testArgs(double a) {
+        return a + ";";
+    }
 }
