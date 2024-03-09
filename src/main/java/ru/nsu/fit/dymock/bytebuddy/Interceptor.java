@@ -4,9 +4,12 @@ import net.bytebuddy.implementation.bind.annotation.*;
 import ru.nsu.fit.dymock.matchers.Stick;
 
 import java.lang.reflect.Method;
-import java.util.*;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Arrays;
 
 public class Interceptor<T> {
     private final Map<String, MethodInterceptionInfo> mapping = new HashMap<>();
@@ -24,13 +27,7 @@ public class Interceptor<T> {
         countCalls++;
         String name = invokedMethod.getName();
         MethodInterceptionInfo interceptionInfo = mapping.get(name);
-        if (interceptionInfo == null) {
-            MethodInterceptionInfo info = new MethodInterceptionInfo(new LinkedList<>());
-            info.incrementCountCalls();
-            mapping.put(name, info);
-        } else {
-            // чьи calls следует считать
-            interceptionInfo.incrementCountCalls();
+        if (interceptionInfo != null) {
             Stick stick = mapping.get(name).getSuitableStick(arguments);
             if (stick != null) {
                 stick.incrementCountCalls();
@@ -56,7 +53,7 @@ public class Interceptor<T> {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(name, new MethodInterceptionInfo(new LinkedList<>(Arrays.asList(stick))));
+            info = mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(Arrays.asList(stick))));
         else
             info.getSticks().add(stick);
     }

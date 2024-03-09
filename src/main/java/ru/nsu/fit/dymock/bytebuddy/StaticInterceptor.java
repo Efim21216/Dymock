@@ -5,9 +5,11 @@ import net.bytebuddy.implementation.bytecode.assign.Assigner;
 import ru.nsu.fit.dymock.matchers.Stick;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.Arrays;
+import java.lang.reflect.Array;
 
 public class StaticInterceptor {
     private static final Map<String, MethodInterceptionInfo> mapping = new HashMap<>();
@@ -24,26 +26,29 @@ public class StaticInterceptor {
     ) {
         String name = method.getName();
         MethodInterceptionInfo interceptionInfo = StaticInterceptor.getRules().get(name);
-        if (interceptionInfo == null) {
-            MethodInterceptionInfo info = new MethodInterceptionInfo(new LinkedList<>());
-            info.incrementCountCalls();
-            StaticInterceptor.getRules().put(name, info);
-            return value;
+        if (interceptionInfo != null) {
+            Stick stick = interceptionInfo.getSuitableStick(arguments);
+            if (stick != null) {
+                stick.incrementCountCalls();
+                return stick.getResult();
+            }
         }
-        interceptionInfo.incrementCountCalls();
-        Stick result = interceptionInfo.getSuitableStick(arguments);
-        if (result == null)
-            return value;
-        result.incrementCountCalls();
-        value = result.getResult();
-        return value;
+        var returnType = method.getReturnType();
+        if(!returnType.equals(Void.TYPE)){
+            return getDefaultValue(returnType);
+        }
+        return null;
+    }
+
+    private static <T> T getDefaultValue(Class<T> clazz) {
+        return (T) Array.get(Array.newInstance(clazz, 1), 0);
     }
 
     public static void addStick(Stick stick, Class<?> clazz) {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(name, new MethodInterceptionInfo(new LinkedList<>()));
+            info = mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(Arrays.asList(stick))));
         else
             info.getSticks().add(stick);
     }
