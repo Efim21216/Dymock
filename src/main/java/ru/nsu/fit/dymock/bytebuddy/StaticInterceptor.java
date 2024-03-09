@@ -30,12 +30,14 @@ public class StaticInterceptor {
             Stick stick = interceptionInfo.getSuitableStick(arguments);
             if (stick != null) {
                 stick.incrementCountCalls();
-                return stick.getResult();
+                value = stick.getResult();
+                return null;
             }
         }
         var returnType = method.getReturnType();
         if(!returnType.equals(Void.TYPE)){
-            return getDefaultValue(returnType);
+            value = getDefaultValue(returnType);
+            return null;
         }
         return null;
     }
