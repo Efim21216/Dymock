@@ -54,7 +54,7 @@ public class Interceptor<T> {
         Method method = stick.getMethod(mocked);
         MethodInterceptionInfo info = mapping.get(method);
         if (info == null)
-            mapping.put(method, new MethodInterceptionInfo(new LinkedList<>()));
+            mapping.put(method, new MethodInterceptionInfo(new LinkedList<>(Arrays.asList(stick))));
         else
             info.getSticks().add(stick);
     }
