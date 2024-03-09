@@ -9,7 +9,7 @@ import java.util.*;
 import java.lang.reflect.Array;
 
 public class Interceptor<T> {
-    private final Map<Method, MethodInterceptionInfo> mapping = new HashMap<>();
+    private final Map<String, MethodInterceptionInfo> mapping = new HashMap<>();
     private int countCalls = 0;
 
     public final Class<T> mocked;
@@ -22,14 +22,16 @@ public class Interceptor<T> {
     public Object invoke(@Origin Method invokedMethod,
                          @AllArguments Object[] arguments) {
         countCalls++;
-        MethodInterceptionInfo interceptionInfo = mapping.get(invokedMethod);
+        String name = invokedMethod.getName();
+        MethodInterceptionInfo interceptionInfo = mapping.get(name);
         if (interceptionInfo == null) {
             MethodInterceptionInfo info = new MethodInterceptionInfo(new LinkedList<>());
             info.incrementCountCalls();
-            mapping.put(invokedMethod, info);
+            mapping.put(name, info);
         } else {
+            // чьи calls следует считать
             interceptionInfo.incrementCountCalls();
-            Stick stick = mapping.get(invokedMethod).getSuitableStick(arguments);
+            Stick stick = mapping.get(name).getSuitableStick(arguments);
             if (stick != null) {
                 stick.incrementCountCalls();
                 return stick.getResult();
@@ -51,14 +53,14 @@ public class Interceptor<T> {
     }
  
     public void addStick(Stick stick) {
-        Method method = stick.getMethod(mocked);
-        MethodInterceptionInfo info = mapping.get(method);
+        String name = stick.getMethodName();
+        MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(method, new MethodInterceptionInfo(new LinkedList<>()));
+            mapping.put(name, new MethodInterceptionInfo(new LinkedList<>()));
         else
             info.getSticks().add(stick);
     }
-    public int getCountCallsMethod(Method method) {
-        return mapping.get(method).getCountCalls();
+    public int getCountCallsMethod(String name) {
+        return mapping.get(name).getCountCalls();
     }
 }

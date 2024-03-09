@@ -40,9 +40,8 @@ public class Stick {
         return true;
     }
 
-    public Method getMethod(Class<?> clazz) {
-        //TODO
-        return null;
+    public String getMethodName() {
+        return methodName;
     }
     public Object getResult() {
         return result;
