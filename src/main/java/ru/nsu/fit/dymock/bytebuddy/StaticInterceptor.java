@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class StaticInterceptor {
-    private static final Map<Method, MethodInterceptionInfo> mapping = new HashMap<>();
+    private static final Map<String, MethodInterceptionInfo> mapping = new HashMap<>();
 
     @Advice.OnMethodEnter(skipOn = Advice.OnDefaultValue.class)
     public static Object onMethodBegin() {
@@ -22,11 +22,12 @@ public class StaticInterceptor {
                                      @Advice.Origin Method method,
                                      @Advice.AllArguments Object[] arguments
     ) {
-        MethodInterceptionInfo interceptionInfo = StaticInterceptor.getRules().get(method);
+        String name = method.getName();
+        MethodInterceptionInfo interceptionInfo = StaticInterceptor.getRules().get(name);
         if (interceptionInfo == null) {
             MethodInterceptionInfo info = new MethodInterceptionInfo(new LinkedList<>());
             info.incrementCountCalls();
-            StaticInterceptor.getRules().put(method, info);
+            StaticInterceptor.getRules().put(name, info);
             return value;
         }
         interceptionInfo.incrementCountCalls();
@@ -37,15 +38,16 @@ public class StaticInterceptor {
         value = result.getResult();
         return value;
     }
+
     public static void addStick(Stick stick, Class<?> clazz) {
-        Method method = stick.getMethod(clazz);
-        MethodInterceptionInfo info = mapping.get(method);
+        String name = stick.getMethodName();
+        MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(method, new MethodInterceptionInfo(new LinkedList<>()));
+            mapping.put(name, new MethodInterceptionInfo(new LinkedList<>()));
         else
             info.getSticks().add(stick);
     }
-    public static Map<Method, MethodInterceptionInfo> getRules() {
+    public static Map<String, MethodInterceptionInfo> getRules() {
         return mapping;
     }
 }

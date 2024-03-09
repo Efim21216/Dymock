@@ -42,7 +42,7 @@ public class Dymock {
     public static boolean ignited(Object mock, String methodName, Class<?>... arguments) throws NoSuchMethodException {
         Method method = mock.getClass().getMethod(methodName, arguments);
         if (mock instanceof InterceptionAccessor) {
-            System.out.println(((InterceptionAccessor) mock).getInterceptor().getCountCallsMethod(method));
+            System.out.println(((InterceptionAccessor) mock).getInterceptor().getCountCallsMethod(method.getName()));
             return true;
         }
         return false;
