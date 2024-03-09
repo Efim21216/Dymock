@@ -56,6 +56,19 @@ public class Tests {
         System.out.println(StaticSayHello.sayHello("", 1));
     }*/
 
+    public static void testOverload(){
+        SayHello test = Dymock.burn(SayHello.class);
+        LeafMatcher[] intArg = {Leaf.green(Integer.class)};
+        LeafMatcher[] dblArg = {Leaf.green(Double.class)};
+
+        BonfireBuilder.buildBonfire(test)
+                .addStick(new Stick("testArgs", intArg, "Hi int"))
+                .addStick(new Stick("testArgs", dblArg, "Hi double"));
+
+        System.out.println(test.testArgs(1)); // Hi int
+        System.out.println(test.testArgs(0.5)); // Hi double
+    }
+
     public static void testSimpleCase() {
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] zeroArg = {};
