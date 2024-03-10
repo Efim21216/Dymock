@@ -59,14 +59,18 @@ public class Tests {
     public static void testOverload(){
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
+        LeafMatcher[] twoIntArg = {Leaf.yellow(2)};
         LeafMatcher[] dblArg = {Leaf.green(Double.class)};
 
         BonfireBuilder.buildBonfire(test)
                 .addStick(new Stick("testArgs", intArg, "Hi int!"))
-                .addStick(new Stick("testArgs", dblArg, "Hi double"));
+                .addStick(new Stick("testArgs", dblArg, "Hi double"))
+                .addStick(new Stick("testArgs", twoIntArg, "Hi 2"));
 
         System.out.println(test.testArgs(1)); // Hi int
         System.out.println(test.testArgs(0.5)); // Hi double
+        System.out.println(test.testArgs(2.0)); // Hi double (doesn't match implicit Integer type)
+        System.out.println(test.testArgs(2)); // Hi 2
     }
 
     public static void testStaticOverload(){

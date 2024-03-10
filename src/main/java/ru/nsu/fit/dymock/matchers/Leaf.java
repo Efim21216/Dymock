@@ -4,7 +4,9 @@ public class Leaf {
     private static Leaf INSTANCE = new Leaf();
 
     private class GreenLeaf extends LeafMatcher{
-        public GreenLeaf(){}
+        public GreenLeaf(){
+            super(Object.class);
+        }
         public GreenLeaf(Class<?> argType){
             super(argType);
         }
@@ -23,6 +25,7 @@ public class Leaf {
         }
     
         public YellowLeaf(Object wanted){
+            super(wanted.getClass());
             this.wanted = wanted;
         }
     
@@ -41,6 +44,7 @@ public class Leaf {
         }
     
         public RedLeaf(Object wanted){
+            super(wanted.getClass());
             this.wanted = wanted;
         }        
         public RedLeaf(Object wanted, Class<?> argType){
