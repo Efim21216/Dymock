@@ -56,6 +56,21 @@ public class Tests {
         System.out.println(StaticSayHello.sayHello("", 1));
     }*/
 
+    public static void testLimitLeaves(){
+        SayHello test = Dymock.burn(SayHello.class);
+        LeafMatcher[] lowArg = {Leaf.limit().to(0)};
+        LeafMatcher[] midArg = {Leaf.limit().from(0.0001).to(1)};
+        LeafMatcher[] highArg = {Leaf.limit().from(1.0001)};
+
+        BonfireBuilder.buildBonfire(test)
+                .addStick(new Stick("testArgs", lowArg, "(-inf, 0]"))
+                .addStick(new Stick("testArgs", midArg, "(0, 1]"))
+                .addStick(new Stick("testArgs", highArg, "(1, inf)"));
+
+        System.out.println(test.testArgs(-1));
+        System.out.println(test.testArgs(0.5));
+        System.out.println(test.testArgs(1.5));
+    }
     public static void testOverload(){
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
