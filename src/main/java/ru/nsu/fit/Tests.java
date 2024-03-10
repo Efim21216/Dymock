@@ -103,7 +103,39 @@ public class Tests {
         System.out.println(test.testArgs(2<<10)); // doesn't match by link
         System.out.println(test.testArgs(num)); // match by link
         test.testVoid(2);
-        Dymock.ignited(test);
+    }
+    public static void testIgnited() {
+        SayHello test = Dymock.burn(SayHello.class);
+        LeafMatcher[] zeroArg = {};
+        Stick testStick = new Stick("sayHello", zeroArg, "Mocked!");
+        BonfireBuilder.buildBonfire(test)
+                .addStick(testStick);
+
+        // FALSE
+        System.out.println("FALSE");
+        System.out.println("\t" + Dymock.ignited(test));
+        System.out.println("\t" + testStick.bask());
+
+        test.sayHello();
+
+        // TRUE
+        System.out.println("TRUE");
+        System.out.println("\t" + Dymock.ignited(test));
+        System.out.println("\t" + testStick.bask());
+        // Exact
+        System.out.println("FALSE");
+        System.out.println("\t" + Dymock.ignited(test, Dymock.exactly(2)));
+        System.out.println("\t" + testStick.bask(Dymock.exactly(2)));
+        System.out.println("TRUE");
+        System.out.println("\t" + Dymock.ignited(test, Dymock.exactly(1)));
+        System.out.println("\t" + testStick.bask(Dymock.exactly(1)));
+        // Limit
+        System.out.println("FALSE");
+        System.out.println("\t" + Dymock.ignited(test, Dymock.limited().from(2)));
+        System.out.println("\t" + testStick.bask(Dymock.limited().from(2)));
+        System.out.println("TRUE");
+        System.out.println("\t" + Dymock.ignited(test, Dymock.limited().to(2)));
+        System.out.println("\t" + testStick.bask(Dymock.limited().to(2))) ;
     }
     public static void testStaticMock() {
         System.out.println("Original invocation");

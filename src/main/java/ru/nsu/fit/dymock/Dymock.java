@@ -5,13 +5,15 @@ import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.bytebuddy.InterceptionAccessor;
 import ru.nsu.fit.dymock.bytebuddy.MockMaker;
 import ru.nsu.fit.dymock.bytebuddy.MockMakerByteBuddy;
-import ru.nsu.fit.dymock.matchers.LeafMatcher;
 import ru.nsu.fit.dymock.matchers.Stick;
+import ru.nsu.fit.dymock.matchers.LeafMatcher;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
 public class Dymock {
+    private static Dymock INSTANCE = new Dymock();
+
     private static final MockMaker maker = new MockMakerByteBuddy();
     private static Boolean isAgentInstalled = false;
     public static <T> T burn(Class<T> classToMock) {
@@ -33,9 +35,25 @@ public class Dymock {
         return null;
     }
     public static boolean ignited(Object mock) {
-        if (mock instanceof InterceptionAccessor) {
-            System.out.println(((InterceptionAccessor) mock).getInterceptor().getCountCalls());
+        if (mock instanceof InterceptionAccessor
+            && ((InterceptionAccessor) mock).getInterceptor().getCountCalls() > 0) {
             return true;
+        }
+        return false;
+    }
+    public static boolean ignited(Object mock, ExactBasker ebasker) {
+        if (mock instanceof InterceptionAccessor
+            && ((InterceptionAccessor) mock).getInterceptor().getCountCalls() == ebasker.getExact()) {
+            return true;
+        }
+        return false;
+    }
+    public static boolean ignited(Object mock, LimitBasker lbasker) {
+        if (mock instanceof InterceptionAccessor){
+            int calls = ((InterceptionAccessor) mock).getInterceptor().getCountCalls();
+            if(lbasker.getLow() < calls && calls < lbasker.getHigh()) {
+                return true;
+            } 
         }
         return false;
     }
@@ -46,5 +64,48 @@ public class Dymock {
             return true;
         }
         return false;
+    }
+
+    public class ExactBasker{
+        private final int exact;
+
+        public ExactBasker(int exact){
+            this.exact = exact;
+        }
+
+        public int getExact(){
+            return this.exact;
+        }
+    }
+
+    public class LimitBasker{
+        private int low = Integer.MIN_VALUE;
+        private int high = Integer.MAX_VALUE;
+
+        public LimitBasker from(int low){
+            this.low = low;
+            return this;
+        }
+
+        public LimitBasker to(int high){
+            this.high = high;
+            return this;
+        }
+
+        public int getLow(){
+            return this.low;
+        }
+
+        public int getHigh(){
+            return this.high;
+        }
+    }
+
+    public static ExactBasker exactly(int value){
+        return INSTANCE.new ExactBasker(value);
+    }
+
+    public static LimitBasker limited(){
+        return INSTANCE.new LimitBasker();
     }
 }

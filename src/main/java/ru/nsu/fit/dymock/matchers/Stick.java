@@ -1,5 +1,7 @@
 package ru.nsu.fit.dymock.matchers;
 
+import ru.nsu.fit.dymock.Dymock;
+
 public class Stick {
     private String methodName;
 
@@ -32,10 +34,6 @@ public class Stick {
     public void incrementCountCalls() {
         countCalls++;
     }
-    public boolean bask() {
-        System.out.println(countCalls);
-        return true;
-    }
 
     public String getMethodName() {
         return methodName;
@@ -44,4 +42,25 @@ public class Stick {
         return result;
     }
 
+    public boolean bask() {
+        if(countCalls > 0){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean bask(Dymock.ExactBasker ebasker) {
+        if(countCalls == ebasker.getExact()){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean bask(Dymock.LimitBasker lbasker) {
+        if(lbasker.getLow() < countCalls 
+            && countCalls < lbasker.getHigh()){
+            return true;
+        }
+        return false;
+    }
 }
