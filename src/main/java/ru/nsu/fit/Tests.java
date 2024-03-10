@@ -105,37 +105,47 @@ public class Tests {
         test.testVoid(2);
     }
     public static void testIgnited() {
-        SayHello test = Dymock.burn(SayHello.class);
+        SayHello testA = Dymock.burn(SayHello.class);
+        SayHello testB = Dymock.burn(SayHello.class);
         LeafMatcher[] zeroArg = {};
         Stick testStick = new Stick("sayHello", zeroArg, "Mocked!");
-        BonfireBuilder.buildBonfire(test)
+        BonfireBuilder.buildBonfire(testA)
+                .addStick(testStick);
+        BonfireBuilder.buildBonfire(testB)
                 .addStick(testStick);
 
         // FALSE
         System.out.println("FALSE");
-        System.out.println("\t" + Dymock.ignited(test));
+        System.out.println("\t" + Dymock.ignited(testA));
         System.out.println("\t" + testStick.bask());
 
-        test.sayHello();
+        testA.sayHello();
 
         // TRUE
         System.out.println("TRUE");
-        System.out.println("\t" + Dymock.ignited(test));
+        System.out.println("\t" + Dymock.ignited(testA));
         System.out.println("\t" + testStick.bask());
         // Exact
         System.out.println("FALSE");
-        System.out.println("\t" + Dymock.ignited(test, Dymock.exactly(2)));
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.exactly(2)));
         System.out.println("\t" + testStick.bask(Dymock.exactly(2)));
         System.out.println("TRUE");
-        System.out.println("\t" + Dymock.ignited(test, Dymock.exactly(1)));
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.exactly(1)));
         System.out.println("\t" + testStick.bask(Dymock.exactly(1)));
         // Limit
         System.out.println("FALSE");
-        System.out.println("\t" + Dymock.ignited(test, Dymock.limited().from(2)));
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().from(2)));
         System.out.println("\t" + testStick.bask(Dymock.limited().from(2)));
         System.out.println("TRUE");
-        System.out.println("\t" + Dymock.ignited(test, Dymock.limited().to(2)));
-        System.out.println("\t" + testStick.bask(Dymock.limited().to(2))) ;
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().to(2)));
+        System.out.println("\t" + testStick.bask(Dymock.limited().to(2)));
+
+        // Specific
+        System.out.println(Dymock.ignited(testB, testStick)); // false
+        testB.sayHello();
+        System.out.println(Dymock.ignited(testB, testStick)); // true
+        System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(2))); 
+        System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(1))); 
     }
     public static void testStaticMock() {
         System.out.println("Original invocation");

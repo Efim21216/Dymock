@@ -54,7 +54,7 @@ public class StaticInterceptor {
         if (info == null)
             info = clazzSticks.put(name, new MethodInterceptionInfo(new ArrayList<>(Arrays.asList(stick))));
         else
-            info.getSticks().add(stick);
+            info.addStick(stick);
     }
 
     public static Map<String, MethodInterceptionInfo> getClassRules(Class<?> clazz) {

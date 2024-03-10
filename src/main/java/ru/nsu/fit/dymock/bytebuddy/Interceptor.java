@@ -30,6 +30,7 @@ public class Interceptor<T> {
         if (interceptionInfo != null) {
             Stick stick = mapping.get(name).getSuitableStick(arguments);
             if (stick != null) {
+                interceptionInfo.incrementLocalStick(stick);
                 stick.incrementCountCalls();
                 return stick.getResult();
             }
@@ -55,9 +56,9 @@ public class Interceptor<T> {
         if (info == null)
             info = mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(Arrays.asList(stick))));
         else
-            info.getSticks().add(stick);
+            info.addStick(stick);
     }
-    public int getCountCallsMethod(String name) {
-        return mapping.get(name).getCountCalls();
+    public int getLocalCountCalls(Stick stick) {
+        return mapping.get(stick.getMethodName()).getCountCount(stick);
     }
 }

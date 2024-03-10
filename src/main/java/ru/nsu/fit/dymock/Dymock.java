@@ -8,7 +8,6 @@ import ru.nsu.fit.dymock.bytebuddy.MockMakerByteBuddy;
 import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.dymock.matchers.LeafMatcher;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 public class Dymock {
@@ -57,11 +56,27 @@ public class Dymock {
         }
         return false;
     }
-    public static boolean ignited(Object mock, String methodName, Class<?>... arguments) throws NoSuchMethodException {
-        Method method = mock.getClass().getMethod(methodName, arguments);
+    public static boolean ignited(Object mock, Stick stick) {
         if (mock instanceof InterceptionAccessor) {
-            System.out.println(((InterceptionAccessor) mock).getInterceptor().getCountCallsMethod(method.getName()));
+            if(((InterceptionAccessor) mock).getInterceptor().getLocalCountCalls(stick) > 0){
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean ignited(Object mock, Stick stick, ExactBasker ebasker) {
+        if (mock instanceof InterceptionAccessor
+            && ((InterceptionAccessor) mock).getInterceptor().getLocalCountCalls(stick) == ebasker.getExact()) {
             return true;
+        }
+        return false;
+    }
+    public static boolean ignited(Object mock, Stick stick, LimitBasker lbasker) {
+        if (mock instanceof InterceptionAccessor){
+            int calls = ((InterceptionAccessor) mock).getInterceptor().getLocalCountCalls(stick);
+            if(lbasker.getLow() < calls && calls < lbasker.getHigh()) {
+                return true;
+            } 
         }
         return false;
     }
