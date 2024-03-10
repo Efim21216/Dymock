@@ -97,12 +97,12 @@ public class Dymock {
         private int low = Integer.MIN_VALUE;
         private int high = Integer.MAX_VALUE;
 
-        public LimitBasker from(int low){
+        public LimitBasker atLeast(int low){
             this.low = low;
             return this;
         }
 
-        public LimitBasker to(int high){
+        public LimitBasker atMost(int high){
             this.high = high;
             return this;
         }

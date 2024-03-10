@@ -134,11 +134,11 @@ public class Tests {
         System.out.println("\t" + testStick.bask(Dymock.exactly(1)));
         // Limit
         System.out.println("FALSE");
-        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().from(2)));
-        System.out.println("\t" + testStick.bask(Dymock.limited().from(2)));
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().atLeast(2)));
+        System.out.println("\t" + testStick.bask(Dymock.limited().atLeast(2)));
         System.out.println("TRUE");
-        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().to(2)));
-        System.out.println("\t" + testStick.bask(Dymock.limited().to(2)));
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().atMost(2)));
+        System.out.println("\t" + testStick.bask(Dymock.limited().atMost(2)));
 
         // Specific
         System.out.println(Dymock.ignited(testB, testStick)); // false
