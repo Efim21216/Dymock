@@ -49,9 +49,6 @@ public class StaticInterceptor {
     public static void addStick(Stick stick, Class<?> clazz) throws IllegalStateException{
         String name = stick.getMethodName();
         Map<String, MethodInterceptionInfo> clazzSticks = classMap.get(clazz);
-        if(clazzSticks == null){
-            throw new IllegalStateException("Can't add sticks to an unmocked class");
-        }
 
         MethodInterceptionInfo info = clazzSticks.get(name);
         if (info == null)

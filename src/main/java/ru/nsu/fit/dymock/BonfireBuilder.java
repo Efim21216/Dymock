@@ -8,6 +8,9 @@ import ru.nsu.fit.dymock.matchers.Stick;
 
 public class BonfireBuilder {
     public static Builder buildBonfire(Object mock) {
+        if(!(mock instanceof Intercepted || mock instanceof InterceptionAccessor)){
+            throw new IllegalStateException("Object " + mock + " is not a burned (mocked) object");
+        }
         return new BonfireBuilder(). new Builder(mock);
     }
 
