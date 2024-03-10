@@ -84,15 +84,14 @@ public class Tests {
 
     public static void testSimpleCase() {
         SayHello test = Dymock.burn(SayHello.class);
-        LeafMatcher[] zeroArg = {};
 
         Integer num = 2<<10;
         LeafMatcher[] anyArg = {Leaf.green()};
         LeafMatcher[] eqNum = {Leaf.yellow(num)};
         LeafMatcher[] linkEqNum = {Leaf.red(num)};
         BonfireBuilder.buildBonfire(test)
-                .addStick(new Stick("sayHello", zeroArg, "Mocked!"))
-                .addStick(new Stick("returnInt", zeroArg, 42))
+                .addStick(new Stick("sayHello", "Mocked!"))
+                .addStick(new Stick("returnInt", 42))
                 .addStick(new Stick("testArgs", anyArg, "ANY"))
                 .addStick(new Stick("testArgs", eqNum, "NUM"))
                 .addStick(new Stick("testArgs", linkEqNum, "THE NUM"))
@@ -110,15 +109,14 @@ public class Tests {
         System.out.println(StaticSayHello.sayHello());
         System.out.println("Mocking class...");
         Intercepted<StaticSayHello> intercepted = Dymock.burnDown(StaticSayHello.class);
-        LeafMatcher[] zeroArg = {};
 
         Integer num = 2<<10;
         LeafMatcher[] anyArg = {Leaf.green(Integer.class)};
         LeafMatcher[] eqNum = {Leaf.yellow(num, Integer.class)};
         LeafMatcher[] linkEqNum = {Leaf.red(num, Integer.class)};
         BonfireBuilder.buildBonfire(intercepted)
-                        .addStick(new Stick("sayHello", zeroArg, 42))
-                .addStick(new Stick("m", zeroArg, "Intercepted value"))
+                        .addStick(new Stick("sayHello", 42))
+                .addStick(new Stick("m", "Intercepted value"))
                 .addStick(new Stick("testArgs", anyArg, "ANY"))
                 .addStick(new Stick("testArgs", eqNum, "NUM"))
                 .addStick(new Stick("testArgs", linkEqNum, "THE NUM"));
@@ -132,11 +130,10 @@ public class Tests {
         Intercepted<StaticSayHello> interceptedHello = Dymock.burnDown(StaticSayHello.class);    
         Intercepted<StaticSayHi> interceptedHi = Dymock.burnDown(StaticSayHi.class);  
 
-        LeafMatcher[] zeroArg = {};
         BonfireBuilder.buildBonfire(interceptedHello)
-                        .addStick(new Stick("m", zeroArg, "Intercepted hello"));
+                        .addStick(new Stick("m", "Intercepted hello"));
         BonfireBuilder.buildBonfire(interceptedHi)
-                        .addStick(new Stick("m", zeroArg, "Intercepted hi"));
+                        .addStick(new Stick("m", "Intercepted hi"));
         
         System.out.println(StaticSayHello.m());
         System.out.println(StaticSayHi.m());
