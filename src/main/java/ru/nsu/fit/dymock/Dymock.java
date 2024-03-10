@@ -80,6 +80,30 @@ public class Dymock {
         }
         return false;
     }
+    public static boolean ignited(Object mock, String methodName) {
+        if (mock instanceof InterceptionAccessor) {
+            if(((InterceptionAccessor) mock).getInterceptor().getMethodCountCalls(methodName) > 0){
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean ignited(Object mock, String methodName, ExactBasker ebasker) {
+        if (mock instanceof InterceptionAccessor
+            && ((InterceptionAccessor) mock).getInterceptor().getMethodCountCalls(methodName) == ebasker.getExact()) {
+            return true;
+        }
+        return false;
+    }
+    public static boolean ignited(Object mock, String methodName, LimitBasker lbasker) {
+        if (mock instanceof InterceptionAccessor){
+            int calls = ((InterceptionAccessor) mock).getInterceptor().getMethodCountCalls(methodName);
+            if(lbasker.getLow() < calls && calls < lbasker.getHigh()) {
+                return true;
+            } 
+        }
+        return false;
+    }
 
     public class ExactBasker{
         private final int exact;

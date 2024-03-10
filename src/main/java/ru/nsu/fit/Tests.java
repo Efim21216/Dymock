@@ -108,9 +108,15 @@ public class Tests {
         SayHello testA = Dymock.burn(SayHello.class);
         SayHello testB = Dymock.burn(SayHello.class);
         LeafMatcher[] zeroArg = {};
+        LeafMatcher[] oneArg = {Leaf.yellow(1)};
+        LeafMatcher[] twoArg = {Leaf.yellow(2)};
         Stick testStick = new Stick("sayHello", zeroArg, "Mocked!");
+        Stick stickOne = new Stick("testArgs", oneArg, "One");
+        Stick stickTwo = new Stick("testArgs", twoArg, "Two");
         BonfireBuilder.buildBonfire(testA)
-                .addStick(testStick);
+                .addStick(testStick)
+                .addStick(stickOne)
+                .addStick(stickTwo);
         BonfireBuilder.buildBonfire(testB)
                 .addStick(testStick);
 
@@ -145,7 +151,14 @@ public class Tests {
         testB.sayHello();
         System.out.println(Dymock.ignited(testB, testStick)); // true
         System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(2))); 
-        System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(1))); 
+        System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(1)));
+
+        // Multiple sticks
+        System.out.println("Multiple sticks");
+        testA.testArgs(1);
+        System.out.println(Dymock.ignited(testA, stickOne));
+        System.out.println(Dymock.ignited(testA, stickTwo));
+        System.out.println(Dymock.ignited(testA, "testArgs"));
     }
     public static void testStaticMock() {
         System.out.println("Original invocation");

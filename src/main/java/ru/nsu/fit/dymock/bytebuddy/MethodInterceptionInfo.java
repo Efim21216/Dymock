@@ -34,8 +34,12 @@ public class MethodInterceptionInfo {
         return result.get(result.size() - 1);
     }
 
-    public int getCountCount(Stick stick){
+    public int getCallCount(Stick stick){
         return this.sticksCounts.get(stick);
+    }
+
+    public int getMethodCallCount(){
+        return this.sticksCounts.values().stream().reduce(0, Integer::sum);
     }
 
     public void addStick(Stick stick){
