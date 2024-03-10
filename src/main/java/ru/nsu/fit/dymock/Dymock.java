@@ -41,16 +41,18 @@ public class Dymock {
         return false;
     }
     public static boolean ignited(Object mock, ExactBasker ebasker) {
-        if (mock instanceof InterceptionAccessor
-            && ((InterceptionAccessor) mock).getInterceptor().getCountCalls() == ebasker.getExact()) {
+        if (mock instanceof InterceptionAccessor){
+            int calls = ((InterceptionAccessor) mock).getInterceptor().getCountCalls();
+            if(ebasker.fits(calls)) {
             return true;
+            }
         }
         return false;
     }
     public static boolean ignited(Object mock, LimitBasker lbasker) {
         if (mock instanceof InterceptionAccessor){
             int calls = ((InterceptionAccessor) mock).getInterceptor().getCountCalls();
-            if(lbasker.getLow() < calls && calls < lbasker.getHigh()) {
+            if(lbasker.fits(calls)) {
                 return true;
             } 
         }
@@ -65,16 +67,18 @@ public class Dymock {
         return false;
     }
     public static boolean ignited(Object mock, Stick stick, ExactBasker ebasker) {
-        if (mock instanceof InterceptionAccessor
-            && ((InterceptionAccessor) mock).getInterceptor().getLocalCountCalls(stick) == ebasker.getExact()) {
+        if (mock instanceof InterceptionAccessor){
+            int calls = ((InterceptionAccessor) mock).getInterceptor().getLocalCountCalls(stick);
+            if(ebasker.fits(calls)) {
             return true;
+            }
         }
         return false;
     }
     public static boolean ignited(Object mock, Stick stick, LimitBasker lbasker) {
         if (mock instanceof InterceptionAccessor){
             int calls = ((InterceptionAccessor) mock).getInterceptor().getLocalCountCalls(stick);
-            if(lbasker.getLow() < calls && calls < lbasker.getHigh()) {
+            if(lbasker.fits(calls)) {
                 return true;
             } 
         }
@@ -89,16 +93,18 @@ public class Dymock {
         return false;
     }
     public static boolean ignited(Object mock, String methodName, ExactBasker ebasker) {
-        if (mock instanceof InterceptionAccessor
-            && ((InterceptionAccessor) mock).getInterceptor().getMethodCountCalls(methodName) == ebasker.getExact()) {
+        if (mock instanceof InterceptionAccessor){
+            int calls = ((InterceptionAccessor) mock).getInterceptor().getMethodCountCalls(methodName);
+            if(ebasker.fits(calls)) {
             return true;
+            }
         }
         return false;
     }
     public static boolean ignited(Object mock, String methodName, LimitBasker lbasker) {
         if (mock instanceof InterceptionAccessor){
             int calls = ((InterceptionAccessor) mock).getInterceptor().getMethodCountCalls(methodName);
-            if(lbasker.getLow() < calls && calls < lbasker.getHigh()) {
+            if(lbasker.fits(calls)) {
                 return true;
             } 
         }
@@ -112,8 +118,8 @@ public class Dymock {
             this.exact = exact;
         }
 
-        public int getExact(){
-            return this.exact;
+        public boolean fits(int value){
+            return value == this.exact;
         }
     }
 
@@ -131,12 +137,8 @@ public class Dymock {
             return this;
         }
 
-        public int getLow(){
-            return this.low;
-        }
-
-        public int getHigh(){
-            return this.high;
+        public boolean fits(int value){
+            return this.low < value && value < this.high;
         }
     }
 

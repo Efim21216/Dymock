@@ -50,15 +50,14 @@ public class Stick {
     }
 
     public boolean bask(Dymock.ExactBasker ebasker) {
-        if(countCalls == ebasker.getExact()){
+        if(ebasker.fits(countCalls)){
             return true;
         }
         return false;
     }
 
     public boolean bask(Dymock.LimitBasker lbasker) {
-        if(lbasker.getLow() < countCalls 
-            && countCalls < lbasker.getHigh()){
+        if(lbasker.fits(countCalls)){
             return true;
         }
         return false;
