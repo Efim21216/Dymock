@@ -40,6 +40,8 @@ public class MockMakerByteBuddy implements MockMaker {
                 .visit(Advice.to(StaticInterceptor.class).on(not(isDeclaredBy(Object.class)).and(isStatic())))
                 .make()
                 .load(classToMock.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
+
+        StaticInterceptor.addIntercepted(classToMock);
         return new Intercepted<>(classToMock);
     }
 }

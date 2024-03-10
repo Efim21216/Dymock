@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.lang.reflect.Array;
 
 public class StaticInterceptor {
-    private static final Map<String, MethodInterceptionInfo> mapping = new HashMap<>();
+    private static final Map<Class<?>, Map<String, MethodInterceptionInfo>> classMap = new HashMap<>();
 
     @Advice.OnMethodEnter(skipOn = Advice.OnDefaultValue.class)
     public static Object onMethodBegin() {
@@ -25,7 +25,7 @@ public class StaticInterceptor {
                                      @Advice.AllArguments Object[] arguments
     ) {
         String name = method.getName();
-        MethodInterceptionInfo interceptionInfo = StaticInterceptor.getRules().get(name);
+        MethodInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass()).get(name);
         if (interceptionInfo != null) {
             Stick stick = interceptionInfo.getSuitableStick(arguments);
             if (stick != null) {
@@ -42,19 +42,29 @@ public class StaticInterceptor {
         return null;
     }
 
-    private static <T> T getDefaultValue(Class<T> clazz) {
+    public static <T> T getDefaultValue(Class<T> clazz) {
         return (T) Array.get(Array.newInstance(clazz, 1), 0);
     }
 
-    public static void addStick(Stick stick, Class<?> clazz) {
+    public static void addStick(Stick stick, Class<?> clazz) throws IllegalStateException{
         String name = stick.getMethodName();
-        MethodInterceptionInfo info = mapping.get(name);
+        Map<String, MethodInterceptionInfo> clazzSticks = classMap.get(clazz);
+        if(clazzSticks == null){
+            throw new IllegalStateException("Can't add sticks to an unmocked class");
+        }
+
+        MethodInterceptionInfo info = clazzSticks.get(name);
         if (info == null)
-            info = mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(Arrays.asList(stick))));
+            info = clazzSticks.put(name, new MethodInterceptionInfo(new ArrayList<>(Arrays.asList(stick))));
         else
             info.getSticks().add(stick);
     }
-    public static Map<String, MethodInterceptionInfo> getRules() {
-        return mapping;
+
+    public static Map<String, MethodInterceptionInfo> getClassRules(Class<?> clazz) {
+        return classMap.get(clazz);
+    }
+
+    public static void addIntercepted(Class<?> clazz){
+        classMap.put(clazz, new HashMap<>());
     }
 }

@@ -128,4 +128,17 @@ public class Tests {
         System.out.println(StaticSayHello.testArgs(2<<10));
         System.out.println(StaticSayHello.testArgs(num)); // doesn't match
     }
+    public static void testStaticNameConflict() {
+        Intercepted<StaticSayHello> interceptedHello = Dymock.burnDown(StaticSayHello.class);    
+        Intercepted<StaticSayHi> interceptedHi = Dymock.burnDown(StaticSayHi.class);  
+
+        LeafMatcher[] zeroArg = {};
+        BonfireBuilder.buildBonfire(interceptedHello)
+                        .addStick(new Stick("m", zeroArg, "Intercepted hello"));
+        BonfireBuilder.buildBonfire(interceptedHi)
+                        .addStick(new Stick("m", zeroArg, "Intercepted hi"));
+        
+        System.out.println(StaticSayHello.m());
+        System.out.println(StaticSayHi.m());
+    }
 }
