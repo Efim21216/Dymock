@@ -30,7 +30,6 @@ public class Leaf {
             super(argType);
             this.wanted = wanted;
         }
-        
     }
 
     private class RedLeaf extends LeafMatcher{
@@ -47,6 +46,27 @@ public class Leaf {
         public RedLeaf(Object wanted, Class<?> argType){
             super(argType);
             this.wanted = wanted;
+        }
+    }
+    
+    private class FloatingLeaf extends LeafMatcher{
+        private final Number wanted;
+        private double THRESHOLD = .0001;
+
+        public FloatingLeaf(Number wanted){
+            super(Number.class);
+            this.wanted = wanted;
+        }
+
+        public FloatingLeaf(Number wanted, double threshold){
+            super(Number.class);
+            this.wanted = wanted;
+            this.THRESHOLD = threshold;
+        }
+        
+        @Override
+        public boolean matches(Object actual) {
+            return super.matches(actual) && Math.abs(wanted.doubleValue() - ((Number)actual).doubleValue()) < this.THRESHOLD;
         }
     }
 
@@ -72,5 +92,13 @@ public class Leaf {
 
     public static LeafMatcher red(Object wanted, Class<?> clazz){
         return INSTANCE.new RedLeaf(wanted, clazz);
+    }
+
+    public static LeafMatcher fleaf(Number wanted){
+        return INSTANCE.new FloatingLeaf(wanted);
+    }
+
+    public static LeafMatcher fleaf(Number wanted, double threshold){
+        return INSTANCE.new FloatingLeaf(wanted, threshold);
     }
 }

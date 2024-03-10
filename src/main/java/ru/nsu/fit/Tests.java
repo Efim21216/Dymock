@@ -138,4 +138,17 @@ public class Tests {
         System.out.println(StaticSayHello.m());
         System.out.println(StaticSayHi.m());
     }
+    public static void testFPComparison(){
+        SayHello test = Dymock.burn(SayHello.class);
+        double f1 = .0;
+        for (int i = 1; i <= 11; i++) {
+            f1 += .1;
+        }
+        LeafMatcher[] arg = {Leaf.fleaf(f1, .0001)};
+        BonfireBuilder.buildBonfire(test).addStick(new Stick("testArgs", arg, "Hell yeah"));
+
+        double f2 = .1 * 11;
+        System.out.println(test.testArgs(f2)); // works
+        System.out.println(test.testArgs(f2+1)); // shouldn't
+    }
 }
