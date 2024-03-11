@@ -1,14 +1,14 @@
-package ru.nsu.fit.dymock;
+package ru.nsu.fit.dymock.matchers;
 
-import java.util.Arrays;
-import java.util.List;
+import ru.nsu.fit.dymock.Dymock;
 
 public class Stick {
-    private String methodName;
+    private final String methodName;
 
-    private LeafMatcher[] leaves;
+    private final LeafMatcher[] leaves;
 
     private final Object result;
+    private int countCalls = 0;
 
     public Stick(String methodName, LeafMatcher[] arguments, Object result) {
         this.methodName = methodName;
@@ -28,15 +28,26 @@ public class Stick {
         return true;
     }
 
+    public int getCountCalls() {
+        return countCalls;
+    }
+    public void incrementCountCalls() {
+        countCalls++;
+    }
+
     public String getMethodName() {
         return methodName;
     }
-
     public Object getResult() {
         return result;
     }
 
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
+    public boolean bask() {
+        return countCalls > 0;
     }
+
+    public boolean bask(Dymock.Basker basker) {
+        return basker.fits(countCalls);
+    }
+
 }

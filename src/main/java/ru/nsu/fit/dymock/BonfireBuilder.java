@@ -1,8 +1,16 @@
 package ru.nsu.fit.dymock;
 
 
+import ru.nsu.fit.dymock.bytebuddy.Intercepted;
+import ru.nsu.fit.dymock.bytebuddy.InterceptionAccessor;
+import ru.nsu.fit.dymock.bytebuddy.StaticInterceptor;
+import ru.nsu.fit.dymock.matchers.Stick;
+
 public class BonfireBuilder {
     public static Builder buildBonfire(Object mock) {
+        if(!(mock instanceof Intercepted || mock instanceof InterceptionAccessor)){
+            throw new IllegalStateException("Object " + mock + " is not a burned (mocked) object");
+        }
         return new BonfireBuilder(). new Builder(mock);
     }
 
@@ -13,8 +21,7 @@ public class BonfireBuilder {
         }
         public Builder addStick(Stick stick) {
             if (current instanceof Intercepted) {
-                stick.setMethodName(((Intercepted) current).getFullName() + "." + stick.getMethodName() + "()");
-                StaticInterceptor.addRule(stick);
+                StaticInterceptor.addStick(stick, ((Intercepted<?>) current).getClazz());
             }
             else
                 ((InterceptionAccessor) current).getInterceptor().addStick(stick);

@@ -1,4 +1,4 @@
-package ru.nsu.fit.dymock;
+package ru.nsu.fit.dymock.bytebuddy;
 
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.asm.Advice;
@@ -9,9 +9,6 @@ import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
 import org.objenesis.ObjenesisStd;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class MockMakerByteBuddy implements MockMaker {
@@ -21,8 +18,7 @@ public class MockMakerByteBuddy implements MockMaker {
     @Override
     public <T> T createMock(Class<T> classToMock) {
         ByteBuddy byteBuddy = new ByteBuddy();
-        Deque<Stick> callMatchers = new ArrayDeque<>();
-        Interceptor interceptor = new Interceptor(callMatchers);
+        Interceptor<T> interceptor = new Interceptor<>(classToMock);
         Class<? extends T> classWithInterceptor = byteBuddy.subclass(classToMock)
                 .method(not(isDeclaredBy(Object.class)))
                 .intercept(MethodDelegation
@@ -38,12 +34,14 @@ public class MockMakerByteBuddy implements MockMaker {
     }
 
     @Override
-    public <T> Intercepted createStaticMock(Class<T> classToMock) {
+    public <T> Intercepted<T> createStaticMock(Class<T> classToMock) {
         new ByteBuddy()
                 .redefine(classToMock)
                 .visit(Advice.to(StaticInterceptor.class).on(not(isDeclaredBy(Object.class)).and(isStatic())))
                 .make()
                 .load(classToMock.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
-        return new Intercepted(classToMock.getCanonicalName());
+
+        StaticInterceptor.addIntercepted(classToMock);
+        return new Intercepted<>(classToMock);
     }
 }

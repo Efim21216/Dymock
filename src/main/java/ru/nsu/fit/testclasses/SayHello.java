@@ -10,6 +10,9 @@ public class SayHello {
     public String testArgs(Integer a) {
         return a + ";";
     }
+    public String testArgs(Double a) {
+        return a + ";";
+    }
     public void testVoid(int a) {
         System.out.println(a);
     }
