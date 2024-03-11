@@ -3,9 +3,9 @@ package ru.nsu.fit.dymock.matchers;
 import ru.nsu.fit.dymock.Dymock;
 
 public class Stick {
-    private String methodName;
+    private final String methodName;
 
-    private LeafMatcher[] leaves;
+    private final LeafMatcher[] leaves;
 
     private final Object result;
     private int countCalls = 0;
@@ -43,23 +43,11 @@ public class Stick {
     }
 
     public boolean bask() {
-        if(countCalls > 0){
-            return true;
-        }
-        return false;
+        return countCalls > 0;
     }
 
-    public boolean bask(Dymock.ExactBasker ebasker) {
-        if(ebasker.fits(countCalls)){
-            return true;
-        }
-        return false;
+    public boolean bask(Dymock.Basker basker) {
+        return basker.fits(countCalls);
     }
 
-    public boolean bask(Dymock.LimitBasker lbasker) {
-        if(lbasker.fits(countCalls)){
-            return true;
-        }
-        return false;
-    }
 }

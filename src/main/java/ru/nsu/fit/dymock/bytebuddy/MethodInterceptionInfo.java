@@ -2,8 +2,7 @@ package ru.nsu.fit.dymock.bytebuddy;
 
 import ru.nsu.fit.dymock.matchers.Stick;
 
-import java.util.Map;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,22 +10,26 @@ import java.util.stream.Collectors;
  * Contains call information of sticks specific to some mock
  */
 public class MethodInterceptionInfo {
-    private final Map<Stick, Integer> sticksCounts;
+    private final List<Stick> sticks;
+    private int countCalls = 0;
+
 
     public MethodInterceptionInfo(List<Stick> sticks) {
-        this.sticksCounts = new HashMap<>();
+        this.sticks = new LinkedList<>();
         for (Stick stick : sticks) {
-            this.sticksCounts.put(stick, 0);
+            this.sticks.add(stick);
         }
     }
 
     public void incrementLocalStick(Stick stick){
-        int count = this.sticksCounts.get(stick);
-        this.sticksCounts.put(stick, count+1);
+        sticks.get(sticks.indexOf(stick)).incrementCountCalls();
+    }
+    public void incrementMethodCallCount() {
+        countCalls++;
     }
 
     public Stick getSuitableStick(Object[] arguments) {
-        List<Stick> result = sticksCounts.keySet().stream()
+        List<Stick> result = sticks.stream()
                 .filter(stick -> stick.matchesLeaves(arguments))
                 .collect(Collectors.toList());
         if (result.size() == 0)
@@ -34,15 +37,15 @@ public class MethodInterceptionInfo {
         return result.get(result.size() - 1);
     }
 
-    public int getCallCount(Stick stick){
-        return this.sticksCounts.get(stick);
+    public int getLocalCallCount(Stick stick){
+        return sticks.get(sticks.indexOf(stick)).getCountCalls();
     }
 
     public int getMethodCallCount(){
-        return this.sticksCounts.values().stream().reduce(0, Integer::sum);
+        return countCalls;
     }
 
     public void addStick(Stick stick){
-        this.sticksCounts.putIfAbsent(stick, 0);
+        sticks.add(stick);
     }
 }

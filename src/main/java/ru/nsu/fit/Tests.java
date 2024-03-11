@@ -8,54 +8,6 @@ import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.testclasses.*;
 
 public class Tests {
-    /*public static void testRedefine() {
-        ByteBuddyAgent.install();
-        Foo foo = new Foo();
-        String className = "ru.nsu.fit.testclasses.Bar";
-        TypePool typePool = TypePool.Default.ofSystemLoader();
-        TypeDescription typeDescription = typePool.describe(className).resolve();
-        new ByteBuddy()
-                .redefine(typeDescription, ClassFileLocator.ForClassLoader.ofSystemLoader())
-                .method(named("m")).intercept(MethodCall.call((Callable<String>) foo::m))
-                .make()
-                .load(Foo.class.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
-        //.load(Foo.class.getClassLoader(), ClassLoadingStrategy.Default.CHILD_FIRST);
-        Bar bar = new Bar();
-        System.out.println(bar.m());
-        System.out.println(foo.m());
-    }
-    public static void testAgent() {
-        Instrumentation instrumentation = ByteBuddyAgent.install();
-        ToStringAgent.premain("", instrumentation);
-        Bar bar = new Bar();
-        System.out.println(bar);
-    }
-
-    public static void testAdvice() {
-        ByteBuddyAgent.install();
-        new ByteBuddy()
-                .redefine(StaticSayHello.class)
-                .visit(Advice.to(MethodTracker.class).on(named("sayHello")))
-                .make()
-                .load(SayHello.class.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
-        System.out.println(StaticSayHello.sayHello("", 1));
-    }*/
-
-   /* public static void testStaticRedefine() {
-        ByteBuddyAgent.install();
-        String className = "ru.nsu.fit.testclasses.StaticSayHello";
-        TypePool typePool = TypePool.Default.ofSystemLoader();
-        TypeDescription typeDescription = typePool.describe(className).resolve();
-        new ByteBuddy()
-                .redefine(typeDescription, ClassFileLocator.ForClassLoader.ofSystemLoader())
-                .method(named("sayHello"))
-                //.intercept(FixedValue.value("Transformed"))
-                .intercept(MethodCall.call(() -> "transformed"))
-                .make()
-                .load(Bar.class.getClassLoader(), ClassLoadingStrategy.Default.CHILD_FIRST);
-        System.out.println(StaticSayHello.sayHello("", 1));
-    }*/
-
     public static void testOverload(){
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
@@ -80,29 +32,6 @@ public class Tests {
 
         System.out.println(StaticSayHello.testArgs(1)); // Hi int
         System.out.println(StaticSayHello.testArgs(0.5)); // Hi double
-    }
-
-    public static void testSimpleCase() {
-        SayHello test = Dymock.burn(SayHello.class);
-        LeafMatcher[] zeroArg = {};
-
-        Integer num = 2<<10;
-        LeafMatcher[] anyArg = {Leaf.green()};
-        LeafMatcher[] eqNum = {Leaf.yellow(num)};
-        LeafMatcher[] linkEqNum = {Leaf.red(num)};
-        BonfireBuilder.buildBonfire(test)
-                .addStick(new Stick("sayHello", zeroArg, "Mocked!"))
-                .addStick(new Stick("returnInt", zeroArg, 42))
-                .addStick(new Stick("testArgs", anyArg, "ANY"))
-                .addStick(new Stick("testArgs", eqNum, "NUM"))
-                .addStick(new Stick("testArgs", linkEqNum, "THE NUM"))
-                .addStick(new Stick("testVoid", anyArg, null));
-        System.out.println(test.sayHello());
-        System.out.println(test.returnInt());
-        System.out.println(test.testArgs(1)); // doesn't match by link or equals
-        System.out.println(test.testArgs(2<<10)); // doesn't match by link
-        System.out.println(test.testArgs(num)); // match by link
-        test.testVoid(2);
     }
     public static void testIgnited() {
         SayHello testA = Dymock.burn(SayHello.class);
@@ -131,20 +60,30 @@ public class Tests {
         System.out.println("TRUE");
         System.out.println("\t" + Dymock.ignited(testA));
         System.out.println("\t" + testStick.bask());
+        System.out.println("\t" + Dymock.ignited(testA, testStick));
+        System.out.println("\t" + Dymock.ignited(testA, "sayHello"));
         // Exact
         System.out.println("FALSE");
         System.out.println("\t" + Dymock.ignited(testA, Dymock.exactly(2)));
         System.out.println("\t" + testStick.bask(Dymock.exactly(2)));
+        System.out.println("\t" + Dymock.ignited(testA, testStick, Dymock.exactly(2)));
+        System.out.println("\t" + Dymock.ignited(testA, "sayHello", Dymock.exactly(2)));
         System.out.println("TRUE");
         System.out.println("\t" + Dymock.ignited(testA, Dymock.exactly(1)));
         System.out.println("\t" + testStick.bask(Dymock.exactly(1)));
+        System.out.println("\t" + Dymock.ignited(testA, testStick, Dymock.exactly(1)));
+        System.out.println("\t" + Dymock.ignited(testA, "sayHello", Dymock.exactly(1)));
         // Limit
         System.out.println("FALSE");
-        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().atLeast(2)));
-        System.out.println("\t" + testStick.bask(Dymock.limited().atLeast(2)));
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.atLeast(2)));
+        System.out.println("\t" + testStick.bask(Dymock.atLeast(2)));
+        System.out.println("\t" + Dymock.ignited(testA, testStick, Dymock.atLeast(2)));
+        System.out.println("\t" + Dymock.ignited(testA, "sayHello", Dymock.atLeast(2)));
         System.out.println("TRUE");
-        System.out.println("\t" + Dymock.ignited(testA, Dymock.limited().atMost(2)));
-        System.out.println("\t" + testStick.bask(Dymock.limited().atMost(2)));
+        System.out.println("\t" + Dymock.ignited(testA, Dymock.atMost(2)));
+        System.out.println("\t" + testStick.bask(Dymock.atMost(2)));
+        System.out.println("\t" + Dymock.ignited(testA, testStick, Dymock.atMost(2)));
+        System.out.println("\t" + Dymock.ignited(testA, "sayHello", Dymock.atMost(2)));
 
         // Specific
         System.out.println(Dymock.ignited(testB, testStick)); // false
@@ -195,5 +134,27 @@ public class Tests {
         
         System.out.println(StaticSayHello.m());
         System.out.println(StaticSayHi.m());
+    }
+    public static void testSimpleCase() {
+        SayHello test = Dymock.burn(SayHello.class);
+        LeafMatcher[] zeroArg = {};
+
+        Integer num = 2<<10;
+        LeafMatcher[] anyArg = {Leaf.green()};
+        LeafMatcher[] eqNum = {Leaf.yellow(num)};
+        LeafMatcher[] linkEqNum = {Leaf.red(num)};
+        BonfireBuilder.buildBonfire(test)
+                .addStick(new Stick("sayHello", zeroArg, "Mocked!"))
+                .addStick(new Stick("returnInt", zeroArg, 42))
+                .addStick(new Stick("testArgs", anyArg, "ANY"))
+                .addStick(new Stick("testArgs", eqNum, "NUM"))
+                .addStick(new Stick("testArgs", linkEqNum, "THE NUM"))
+                .addStick(new Stick("testVoid", anyArg, null));
+        System.out.println(test.sayHello());
+        System.out.println(test.returnInt());
+        System.out.println(test.testArgs(1)); // doesn't match by link or equals
+        System.out.println(test.testArgs(2<<10)); // doesn't match by link
+        System.out.println(test.testArgs(num)); // match by link
+        test.testVoid(2);
     }
 }

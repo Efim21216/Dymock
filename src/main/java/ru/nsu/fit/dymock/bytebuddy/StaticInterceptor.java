@@ -5,14 +5,12 @@ import net.bytebuddy.implementation.bytecode.assign.Assigner;
 import ru.nsu.fit.dymock.matchers.Stick;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Arrays;
 import java.lang.reflect.Array;
 
 public class StaticInterceptor {
-    private static final Map<Class<?>, Map<String, MethodInterceptionInfo>> classMap = new HashMap<>();
+    private static final Map<Class<?>, StaticInterceptionInfo> classMap = new HashMap<>();
 
     @Advice.OnMethodEnter(skipOn = Advice.OnDefaultValue.class)
     public static Object onMethodBegin() {
@@ -25,21 +23,22 @@ public class StaticInterceptor {
                                      @Advice.AllArguments Object[] arguments
     ) {
         String name = method.getName();
-        MethodInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass()).get(name);
-        if (interceptionInfo != null) {
-            Stick stick = interceptionInfo.getSuitableStick(arguments);
-            if (stick != null) {
-                stick.incrementCountCalls();
-                value = stick.getResult();
-                return null;
-            }
+        StaticInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass());
+        if (interceptionInfo == null)
+            throw new IllegalStateException("Interception info for static is null");
+        interceptionInfo.incrementClassCountCalls();
+        interceptionInfo.incrementMethodCountCalls(name);
+        Stick stick = interceptionInfo.getSuitableStick(name, arguments);
+        if (stick != null) {
+            interceptionInfo.incrementLocalCountCalls(stick);
+            value = stick.getResult();
+            return value;
         }
+
         var returnType = method.getReturnType();
-        if(!returnType.equals(Void.TYPE)){
+        if(!returnType.equals(Void.TYPE))
             value = getDefaultValue(returnType);
-            return null;
-        }
-        return null;
+        return value;
     }
 
     public static <T> T getDefaultValue(Class<T> clazz) {
@@ -47,21 +46,14 @@ public class StaticInterceptor {
     }
 
     public static void addStick(Stick stick, Class<?> clazz) throws IllegalStateException{
-        String name = stick.getMethodName();
-        Map<String, MethodInterceptionInfo> clazzSticks = classMap.get(clazz);
-
-        MethodInterceptionInfo info = clazzSticks.get(name);
-        if (info == null)
-            info = clazzSticks.put(name, new MethodInterceptionInfo(new ArrayList<>(Arrays.asList(stick))));
-        else
-            info.addStick(stick);
+        classMap.get(clazz).addStick(stick);
     }
 
-    public static Map<String, MethodInterceptionInfo> getClassRules(Class<?> clazz) {
+    public static StaticInterceptionInfo getClassRules(Class<?> clazz) {
         return classMap.get(clazz);
     }
 
     public static void addIntercepted(Class<?> clazz){
-        classMap.put(clazz, new HashMap<>());
+        classMap.put(clazz, new StaticInterceptionInfo());
     }
 }
