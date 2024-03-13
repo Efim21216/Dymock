@@ -4,7 +4,9 @@ public class Leaf {
     private static Leaf INSTANCE = new Leaf();
 
     private class GreenLeaf extends LeafMatcher{
-        public GreenLeaf(){}
+        public GreenLeaf(){
+            super(Object.class);
+        }
         public GreenLeaf(Class<?> argType){
             super(argType);
         }
@@ -23,6 +25,7 @@ public class Leaf {
         }
     
         public YellowLeaf(Object wanted){
+            super(wanted.getClass());
             this.wanted = wanted;
         }
     
@@ -30,7 +33,6 @@ public class Leaf {
             super(argType);
             this.wanted = wanted;
         }
-        
     }
 
     private class RedLeaf extends LeafMatcher{
@@ -42,11 +44,66 @@ public class Leaf {
         }
     
         public RedLeaf(Object wanted){
+            super(wanted.getClass());
             this.wanted = wanted;
         }        
         public RedLeaf(Object wanted, Class<?> argType){
             super(argType);
             this.wanted = wanted;
+        }
+    }
+    
+    private class FloatingLeaf extends LeafMatcher{
+        private final Number wanted;
+        private double THRESHOLD = .0001;
+
+        public FloatingLeaf(Number wanted){
+            super(Number.class);
+            this.wanted = wanted;
+        }
+
+        public FloatingLeaf(Number wanted, double threshold){
+            super(Number.class);
+            this.wanted = wanted;
+            this.THRESHOLD = threshold;
+        }
+        
+        @Override
+        public boolean matches(Object actual) {
+            return super.matches(actual) && Math.abs(wanted.doubleValue() - ((Number)actual).doubleValue()) < this.THRESHOLD;
+        }
+    }
+    
+    public class LimitLeaf extends LeafMatcher{
+        private double THRESHOLD = .0001;
+        private double lo_limit = -Double.MAX_VALUE;
+        private double hi_limit = Double.MAX_VALUE;
+
+        public LimitLeaf(){
+            super(Number.class);
+        }
+
+        public LimitLeaf(double threshold){
+            super(Number.class);
+            this.THRESHOLD = threshold;
+        }
+
+        public LimitLeaf from(double min){
+            this.lo_limit = min;
+            return this;
+        }
+
+        public LimitLeaf to(double max){
+            this.hi_limit = max;
+            return this;
+        }
+        
+        @Override
+        public boolean matches(Object actual) {
+            double value = ((Number) actual).doubleValue();
+            return super.matches(actual) 
+            && value - this.lo_limit > this.THRESHOLD 
+            && this.hi_limit - value > this.THRESHOLD;
         }
     }
 
@@ -72,5 +129,21 @@ public class Leaf {
 
     public static LeafMatcher red(Object wanted, Class<?> clazz){
         return INSTANCE.new RedLeaf(wanted, clazz);
+    }
+
+    public static LeafMatcher fleaf(Number wanted){
+        return INSTANCE.new FloatingLeaf(wanted);
+    }
+
+    public static LeafMatcher fleaf(Number wanted, double threshold){
+        return INSTANCE.new FloatingLeaf(wanted, threshold);
+    }
+
+    public static LimitLeaf limit(){
+        return INSTANCE.new LimitLeaf();
+    }
+
+    public static LimitLeaf limit(double threshold){
+        return INSTANCE.new LimitLeaf(threshold);
     }
 }

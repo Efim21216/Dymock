@@ -11,14 +11,18 @@ public class Tests {
     public static void testOverload(){
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
+        LeafMatcher[] twoIntArg = {Leaf.yellow(2)};
         LeafMatcher[] dblArg = {Leaf.green(Double.class)};
 
         BonfireBuilder.buildBonfire(test)
                 .addStick(new Stick("testArgs", intArg, "Hi int!"))
-                .addStick(new Stick("testArgs", dblArg, "Hi double"));
+                .addStick(new Stick("testArgs", dblArg, "Hi double"))
+                .addStick(new Stick("testArgs", twoIntArg, "Hi 2"));
 
         System.out.println(test.testArgs(1)); // Hi int
         System.out.println(test.testArgs(0.5)); // Hi double
+        System.out.println(test.testArgs(2.0)); // Hi double (doesn't match implicit Integer type)
+        System.out.println(test.testArgs(2)); // Hi 2
     }
 
     public static void testStaticOverload(){
@@ -89,7 +93,7 @@ public class Tests {
         System.out.println(Dymock.ignited(testB, testStick)); // false
         testB.sayHello();
         System.out.println(Dymock.ignited(testB, testStick)); // true
-        System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(2))); 
+        System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(2)));
         System.out.println(Dymock.ignited(testB, testStick, Dymock.exactly(1)));
 
         // Multiple sticks
@@ -134,6 +138,19 @@ public class Tests {
         
         System.out.println(StaticSayHello.m());
         System.out.println(StaticSayHi.m());
+    }
+    public static void testFPComparison(){
+        SayHello test = Dymock.burn(SayHello.class);
+        double f1 = .0;
+        for (int i = 1; i <= 11; i++) {
+            f1 += .1;
+        }
+        LeafMatcher[] arg = {Leaf.fleaf(f1, .0001)};
+        BonfireBuilder.buildBonfire(test).addStick(new Stick("testArgs", arg, "Hell yeah"));
+
+        double f2 = .1 * 11;
+        System.out.println(test.testArgs(f2)); // works
+        System.out.println(test.testArgs(f2+1)); // shouldn't
     }
     public static void testSimpleCase() {
         SayHello test = Dymock.burn(SayHello.class);

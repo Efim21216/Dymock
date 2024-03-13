@@ -5,7 +5,8 @@ import ru.nsu.fit.dymock.Dymock;
 public class Stick {
     private final String methodName;
 
-    private final LeafMatcher[] leaves;
+    private LeafMatcher[] leaves;
+    private final boolean needsMatching;
 
     private final Object result;
     private int countCalls = 0;
@@ -13,9 +14,20 @@ public class Stick {
     public Stick(String methodName, LeafMatcher[] arguments, Object result) {
         this.methodName = methodName;
         this.leaves = arguments;
+        this.needsMatching = true;
+        this.result = result;
+    }
+
+    public Stick(String methodName, Object result) {
+        this.methodName = methodName;
+        this.needsMatching = false;
         this.result = result;
     }
     public boolean matchesLeaves(Object[] arguments){
+        if(this.needsMatching == false){
+            return true;
+        }
+
         if(arguments.length != leaves.length){
             return false;
         }
@@ -24,7 +36,6 @@ public class Stick {
                 return false;
             }
         }
-        
         return true;
     }
 
