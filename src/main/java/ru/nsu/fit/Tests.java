@@ -5,6 +5,7 @@ import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
 import ru.nsu.fit.dymock.matchers.LeafMatcher;
 import ru.nsu.fit.dymock.matchers.Stick;
+import ru.nsu.fit.dymock.matchers.WetStick;
 import ru.nsu.fit.testclasses.*;
 
 public class Tests {
@@ -173,5 +174,13 @@ public class Tests {
         System.out.println(test.testArgs(2<<10)); // doesn't match by link
         System.out.println(test.testArgs(num)); // match by link
         test.testVoid(2);
+    }
+    public static void testThrowable() {
+        SayHello test = Dymock.burn(SayHello.class);
+        LeafMatcher[] anyArg = {Leaf.green()};
+        BonfireBuilder.buildBonfire(test)
+                .addStick(new WetStick("sayHello", new Exception("Mock sayHello")))
+                .addStick(new WetStick("testArgs", anyArg, new Exception("Mock testArgs")));
+        System.out.println(test.testArgs(1));
     }
 }

@@ -2,6 +2,7 @@ package ru.nsu.fit.dymock.bytebuddy;
 
 import net.bytebuddy.implementation.bind.annotation.*;
 import ru.nsu.fit.dymock.matchers.Stick;
+import ru.nsu.fit.dymock.matchers.WetStick;
 
 import java.lang.reflect.Method;
 
@@ -20,7 +21,7 @@ public class Interceptor<T> {
 
     @RuntimeType
     public Object invoke(@Origin Method invokedMethod,
-                         @AllArguments Object[] arguments) {
+                         @AllArguments Object[] arguments) throws Throwable {
         countCalls++;
         String name = invokedMethod.getName();
         MethodInterceptionInfo interceptionInfo = mapping.get(name);
@@ -29,6 +30,9 @@ public class Interceptor<T> {
             Stick stick = mapping.get(name).getSuitableStick(arguments);
             if (stick != null) {
                 interceptionInfo.incrementLocalStick(stick);
+                if (stick instanceof WetStick) {
+                    throw ((WetStick) stick).getResult();
+                }
                 return stick.getResult();
             }
         }
