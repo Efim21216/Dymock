@@ -13,7 +13,10 @@ public class Dymock {
     private static final MockMaker maker = new MockMakerByteBuddy();
     private static Boolean isAgentInstalled = false;
     public static <T> T burn(Class<T> classToMock) {
-        return maker.createMock(classToMock);
+        return maker.createMock(classToMock, false);
+    }
+    public static <T> T spy(Class<T> classToSpy) {
+        return maker.createMock(classToSpy, true);
     }
     public static <T> Intercepted<T> burnDown(Class<T> classToMock) {
         if (!isAgentInstalled) {
