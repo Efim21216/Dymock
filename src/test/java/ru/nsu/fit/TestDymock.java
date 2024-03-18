@@ -1,21 +1,11 @@
 package ru.nsu.fit;
 
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.modifier.Visibility;
-import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
-import net.bytebuddy.implementation.FieldAccessor;
-import net.bytebuddy.implementation.FixedValue;
-import net.bytebuddy.implementation.MethodDelegation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.objenesis.ObjenesisStd;
 import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
-import ru.nsu.fit.dymock.bytebuddy.InterceptionAccessor;
-import ru.nsu.fit.dymock.bytebuddy.Interceptor;
 import ru.nsu.fit.dymock.matchers.Leaf;
-import ru.nsu.fit.dymock.matchers.LeafMatcher;
 import ru.nsu.fit.dymock.matchers.Stick;
 
 public class TestDymock {
@@ -91,5 +81,26 @@ public class TestDymock {
         Assertions.assertEquals("Yellow", mock.helloBar(new Foo.Bar("Mr")));
         Assertions.assertEquals("Red", mock.helloBar(arg));
     }
-
+    @Test
+    public void testSpyAndChainMatchers() {
+        Foo mock = Dymock.spy(Foo.class);
+        Foo.Bar arg = new Foo.Bar("Mr");
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(new Stick("helloBar", "Green", Leaf.green()))
+                .addStick(new Stick("helloBar", "Yellow", Leaf.yellow(arg)))
+                .addStick(new Stick("helloBar", "Red", Leaf.red(arg)));
+        Assertions.assertEquals("Green", mock.helloBar(new Foo.Bar("")));
+        Assertions.assertEquals("Yellow", mock.helloBar(new Foo.Bar("Mr")));
+        Assertions.assertEquals("Red", mock.helloBar(arg));
+        Assertions.assertEquals(12, mock.echoInt(12));
+    }
+    @Test
+    public void testUseStaticInAnotherClass() {
+        UseStaticMethod useStaticMethod = new UseStaticMethod(true);
+        Assertions.assertEquals(4.0, useStaticMethod.advancedSum(1.0, 1.0));
+        Intercepted<StaticMethod> mock = Dymock.burnDown(StaticMethod.class);
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(new Stick("plus", 1.0, Leaf.yellow(1.0), Leaf.yellow(1.0)));
+        Assertions.assertEquals(2.0, useStaticMethod.advancedSum(1.0, 1.0));
+    }
 }
