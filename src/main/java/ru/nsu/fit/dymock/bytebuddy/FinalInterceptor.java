@@ -5,24 +5,24 @@ import net.bytebuddy.implementation.bytecode.assign.Assigner;
 import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.dymock.matchers.WetStick;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.lang.reflect.Array;
 
-public class StaticInterceptor {
-    private static final Map<Class<?>, StaticInterceptionInfo> classMap = new HashMap<>();
-
+public class FinalInterceptor {
+    private static final Map<Object, StaticInterceptionInfo> mockMap = new HashMap<>();
     @Advice.OnMethodEnter(skipOn = Advice.OnDefaultValue.class)
     public static Object onMethodBegin(
             @Advice.Origin Method method,
+            @Advice.This Object invokedObject,
             @Advice.AllArguments Object[] arguments,
             @Advice.Local("result") Object localVariable
     ) throws Throwable {
         String name = method.getName();
-        StaticInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass());
+        StaticInterceptionInfo interceptionInfo = FinalInterceptor.getObjectRules(invokedObject);
         if (interceptionInfo == null)
-            throw new IllegalStateException("Interception info for static is null");
+            return "default call";
         interceptionInfo.incrementClassCountCalls();
         interceptionInfo.incrementMethodCountCalls(name);
         Stick stick = interceptionInfo.getSuitableStick(name, arguments);
@@ -44,14 +44,15 @@ public class StaticInterceptor {
     @Advice.OnMethodExit
     public static Object onMethodEnd(@Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object value,
                                      @Advice.Origin Method method,
+                                     @Advice.This Object invokedObject,
                                      @Advice.Local("result") Object localVariable
     ) {
         if (localVariable != null) {
             value = localVariable;
             return value;
         }
-        StaticInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass());
-        if (interceptionInfo.isSpy())
+        StaticInterceptionInfo interceptionInfo = FinalInterceptor.getObjectRules(invokedObject);
+        if (interceptionInfo == null || interceptionInfo.isSpy())
             return value;
         var returnType = method.getReturnType();
         if(!returnType.equals(Void.TYPE))
@@ -63,15 +64,15 @@ public class StaticInterceptor {
         return (T) Array.get(Array.newInstance(clazz, 1), 0);
     }
 
-    public static void addStick(Stick stick, Class<?> clazz) throws IllegalStateException{
-        classMap.get(clazz).addStick(stick);
+    public static void addStick(Stick stick, Object mock) throws IllegalStateException{
+        mockMap.get(mock).addStick(stick);
     }
 
-    public static StaticInterceptionInfo getClassRules(Class<?> clazz) {
-        return classMap.get(clazz);
+    public static StaticInterceptionInfo getObjectRules(Object mock) {
+        return mockMap.get(mock);
     }
 
-    public static void addIntercepted(Class<?> clazz, boolean isSpy){
-        classMap.put(clazz, new StaticInterceptionInfo(isSpy));
+    public static void addIntercepted(Object mock, boolean isSpy){
+        mockMap.put(mock, new StaticInterceptionInfo(isSpy));
     }
 }

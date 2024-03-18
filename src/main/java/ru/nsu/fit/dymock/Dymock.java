@@ -5,6 +5,7 @@ import ru.nsu.fit.dymock.bytebuddy.*;
 import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.dymock.matchers.LeafMatcher;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 public class Dymock {
@@ -13,10 +14,19 @@ public class Dymock {
     private static final MockMaker maker = new MockMakerByteBuddy();
     private static Boolean isAgentInstalled = false;
     public static <T> T burn(Class<T> classToMock) {
-        return maker.createMock(classToMock, false);
+        return maker.createMock(classToMock, false, checkIsFinal(classToMock));
     }
     public static <T> T spy(Class<T> classToSpy) {
-        return maker.createMock(classToSpy, true);
+        boolean isFinal = Modifier.isFinal(classToSpy.getModifiers());
+        return maker.createMock(classToSpy, true, checkIsFinal(classToSpy));
+    }
+    private static <T> boolean checkIsFinal(Class<T> classToMock) {
+        boolean isFinal = Modifier.isFinal(classToMock.getModifiers());
+        if (!isAgentInstalled && isFinal) {
+            ByteBuddyAgent.install();
+            isAgentInstalled = true;
+        }
+        return isFinal;
     }
     public static <T> Intercepted<T> burnDown(Class<T> classToMock) {
         if (!isAgentInstalled) {

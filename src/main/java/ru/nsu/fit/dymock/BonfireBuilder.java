@@ -1,14 +1,18 @@
 package ru.nsu.fit.dymock;
 
 
+import ru.nsu.fit.dymock.bytebuddy.FinalInterceptor;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.bytebuddy.InterceptionAccessor;
 import ru.nsu.fit.dymock.bytebuddy.StaticInterceptor;
 import ru.nsu.fit.dymock.matchers.Stick;
 
+import java.lang.reflect.Modifier;
+
 public class BonfireBuilder {
     public static Builder buildBonfire(Object mock) {
-        if(!(mock instanceof Intercepted || mock instanceof InterceptionAccessor)){
+        if(!(mock instanceof Intercepted || mock instanceof InterceptionAccessor ||
+                Modifier.isFinal(mock.getClass().getModifiers()))){
             throw new IllegalStateException("Object " + mock + " is not a burned (mocked) object");
         }
         return new BonfireBuilder(). new Builder(mock);
@@ -23,8 +27,12 @@ public class BonfireBuilder {
             if (current instanceof Intercepted) {
                 StaticInterceptor.addStick(stick, ((Intercepted<?>) current).getClazz());
             }
-            else
+            else if (current instanceof InterceptionAccessor) {
                 ((InterceptionAccessor) current).getInterceptor().addStick(stick);
+            }
+            else
+                FinalInterceptor.addStick(stick, current);
+
             return this;
         }
     }

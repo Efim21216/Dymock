@@ -9,6 +9,7 @@ import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.MethodDelegation;
 import org.objenesis.ObjenesisStd;
 
+
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 public class MockMakerByteBuddy implements MockMaker {
@@ -16,7 +17,10 @@ public class MockMakerByteBuddy implements MockMaker {
     private final ObjenesisStd objenesis = new ObjenesisStd();
 
     @Override
-    public <T> T createMock(Class<T> classToMock, boolean isSpy) {
+    public <T> T createMock(Class<T> classToMock, boolean isSpy, boolean isFinal) {
+        if (isFinal) {
+            return createFinalMock(classToMock, isSpy);
+        }
         ByteBuddy byteBuddy = new ByteBuddy();
         Interceptor<T> interceptor = new Interceptor<>(classToMock, isSpy);
         Class<? extends T> classWithInterceptor = byteBuddy
@@ -33,6 +37,16 @@ public class MockMakerByteBuddy implements MockMaker {
         ((InterceptionAccessor) mock).setInterceptor(interceptor);
         return mock;
     }
+    private <T> T createFinalMock(Class<T> classToMock, boolean isSpy) {
+        Class<? extends T> mockedClass = new ByteBuddy()
+                .redefine(classToMock)
+                .visit(Advice.to(FinalInterceptor.class).on(not(isDeclaredBy(Object.class)).and(not(isConstructor()))))
+                .make()
+                .load(classToMock.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent()).getLoaded();
+        T mock = objenesis.newInstance(mockedClass);
+        FinalInterceptor.addIntercepted(mock, isSpy);
+        return mock;
+    }
 
     @Override
     public <T> Intercepted<T> createStaticMock(Class<T> classToMock, boolean isSpy) {
@@ -41,7 +55,6 @@ public class MockMakerByteBuddy implements MockMaker {
                 .visit(Advice.to(StaticInterceptor.class).on(not(isDeclaredBy(Object.class)).and(isStatic())))
                 .make()
                 .load(classToMock.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
-
         StaticInterceptor.addIntercepted(classToMock, isSpy);
         return new Intercepted<>(classToMock);
     }

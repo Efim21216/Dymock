@@ -29,6 +29,13 @@ public class TestDymock {
         Assertions.assertEquals(StaticMethod.plus(1.0, 1.0), 0.0);
     }
     @Test
+    public void testFinalEmptyMock() {
+        FinalClass mock = Dymock.burn(FinalClass.class);
+        Assertions.assertFalse(mock.isDivisor(2, 1));
+        FinalClass origin = new FinalClass();
+        Assertions.assertTrue(origin.isDivisor(2, 1));
+    }
+    @Test
     public void testEmptySpy() {
         Foo mock = Dymock.spy(Foo.class);
         Assertions.assertEquals(mock.returnInt(), 42);
@@ -52,6 +59,14 @@ public class TestDymock {
         BonfireBuilder.buildBonfire(mock)
                 .addStick(new Stick("plus", 0.0, Leaf.green(), Leaf.green()));
         Assertions.assertEquals(StaticMethod.plus(2.0, 2.0), 0.0);
+    }
+    @Test
+    public void testFinalStick() {
+        FinalClass mock = Dymock.burn(FinalClass.class);
+        BonfireBuilder.buildBonfire(mock)
+                        .addStick(new Stick("isDivisor", true, Leaf.green(), Leaf.green()));
+        Assertions.assertTrue(mock.isDivisor(2, 3));
+        Assertions.assertFalse(new FinalClass().isDivisor(2, 3));
     }
     @Test
     public void testMatcherEquals() {
