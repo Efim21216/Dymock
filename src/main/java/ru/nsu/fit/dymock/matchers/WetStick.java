@@ -1,8 +1,8 @@
 package ru.nsu.fit.dymock.matchers;
 
 public class WetStick extends Stick {
-    public WetStick(String methodName, LeafMatcher[] arguments, Throwable result) {
-        super(methodName, arguments, result);
+    public WetStick(String methodName, Throwable result, LeafMatcher... arguments) {
+        super(methodName, result, arguments);
     }
     public WetStick(String methodName, Throwable result) {
         super(methodName, result);

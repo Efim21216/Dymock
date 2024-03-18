@@ -19,7 +19,8 @@ public class MockMakerByteBuddy implements MockMaker {
     public <T> T createMock(Class<T> classToMock, boolean isSpy) {
         ByteBuddy byteBuddy = new ByteBuddy();
         Interceptor<T> interceptor = new Interceptor<>(classToMock, isSpy);
-        Class<? extends T> classWithInterceptor = byteBuddy.subclass(classToMock)
+        Class<? extends T> classWithInterceptor = byteBuddy
+                .subclass(classToMock)
                 .method(not(isDeclaredBy(Object.class)))
                 .intercept(MethodDelegation
                         .toField("interceptor"))

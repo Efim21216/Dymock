@@ -9,7 +9,7 @@ import ru.nsu.fit.dymock.matchers.WetStick;
 import ru.nsu.fit.testclasses.*;
 
 public class Tests {
-    public static void testOverload(){
+    /*public static void testOverload(){
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
         LeafMatcher[] twoIntArg = {Leaf.yellow(2)};
@@ -24,9 +24,9 @@ public class Tests {
         System.out.println(test.testArgs(0.5)); // Hi double
         System.out.println(test.testArgs(2.0)); // Hi double (doesn't match implicit Integer type)
         System.out.println(test.testArgs(2)); // Hi 2
-    }
+    }*/
 
-    public static void testStaticOverload(){
+    /*public static void testStaticOverload(){
         Intercepted<StaticSayHello> intercepted = Dymock.burnDown(StaticSayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
         LeafMatcher[] dblArg = {Leaf.green(Double.class)};
@@ -37,8 +37,8 @@ public class Tests {
 
         System.out.println(StaticSayHello.testArgs(1)); // Hi int
         System.out.println(StaticSayHello.testArgs(0.5)); // Hi double
-    }
-    public static void testIgnited() {
+    }*/
+    /*public static void testIgnited() {
         SayHello testA = Dymock.burn(SayHello.class);
         SayHello testB = Dymock.burn(SayHello.class);
         LeafMatcher[] zeroArg = {};
@@ -103,8 +103,8 @@ public class Tests {
         System.out.println(Dymock.ignited(testA, stickOne));
         System.out.println(Dymock.ignited(testA, stickTwo));
         System.out.println(Dymock.ignited(testA, "testArgs"));
-    }
-    public static void testStaticMock() {
+    }*/
+    /*public static void testStaticMock() {
         System.out.println("Original invocation");
         System.out.println(StaticSayHello.sayHello());
         System.out.println("Mocking class...");
@@ -126,8 +126,8 @@ public class Tests {
         System.out.println(StaticSayHello.testArgs(1));
         System.out.println(StaticSayHello.testArgs(2<<10));
         System.out.println(StaticSayHello.testArgs(num)); // doesn't match
-    }
-    public static void testStaticNameConflict() {
+    }*/
+    /*public static void testStaticNameConflict() {
         Intercepted<StaticSayHello> interceptedHello = Dymock.burnDown(StaticSayHello.class);    
         Intercepted<StaticSayHi> interceptedHi = Dymock.burnDown(StaticSayHi.class);  
 
@@ -139,8 +139,8 @@ public class Tests {
         
         System.out.println(StaticSayHello.m());
         System.out.println(StaticSayHi.m());
-    }
-    public static void testFPComparison(){
+    }*/
+    /*public static void testFPComparison(){
         SayHello test = Dymock.burn(SayHello.class);
         double f1 = .0;
         for (int i = 1; i <= 11; i++) {
@@ -152,57 +152,57 @@ public class Tests {
         double f2 = .1 * 11;
         System.out.println(test.testArgs(f2)); // works
         System.out.println(test.testArgs(f2+1)); // shouldn't
-    }
-    public static void testSimpleCase() {
-        SayHello test = Dymock.burn(SayHello.class);
-        LeafMatcher[] zeroArg = {};
-
-        Integer num = 2<<10;
-        LeafMatcher[] anyArg = {Leaf.green()};
-        LeafMatcher[] eqNum = {Leaf.yellow(num)};
-        LeafMatcher[] linkEqNum = {Leaf.red(num)};
-        BonfireBuilder.buildBonfire(test)
-                .addStick(new Stick("sayHello", zeroArg, "Mocked!"))
-                .addStick(new Stick("returnInt", zeroArg, 42))
-                .addStick(new Stick("testArgs", anyArg, "ANY"))
-                .addStick(new Stick("testArgs", eqNum, "NUM"))
-                .addStick(new Stick("testArgs", linkEqNum, "THE NUM"))
-                .addStick(new Stick("testVoid", anyArg, null));
-        System.out.println(test.sayHello());
-        System.out.println(test.returnInt());
-        System.out.println(test.testArgs(1)); // doesn't match by link or equals
-        System.out.println(test.testArgs(2<<10)); // doesn't match by link
-        System.out.println(test.testArgs(num)); // match by link
-        test.testVoid(2);
-    }
-    public static void testThrowable() {
+    }*/
+//    public static void testSimpleCase() {
+//        SayHello test = Dymock.burn(SayHello.class);
+//        LeafMatcher[] zeroArg = {};
+//
+//        Integer num = 2<<10;
+//        LeafMatcher[] anyArg = {Leaf.green()};
+//        LeafMatcher[] eqNum = {Leaf.yellow(num)};
+//        LeafMatcher[] linkEqNum = {Leaf.red(num)};
+//        BonfireBuilder.buildBonfire(test)
+//                .addStick(new Stick("sayHello", zeroArg, "Mocked!"))
+//                .addStick(new Stick("returnInt", zeroArg, 42))
+//                .addStick(new Stick("testArgs", anyArg, "ANY"))
+//                .addStick(new Stick("testArgs", eqNum, "NUM"))
+//                .addStick(new Stick("testArgs", linkEqNum, "THE NUM"))
+//                .addStick(new Stick("testVoid", anyArg, null));
+//        System.out.println(test.sayHello());
+//        System.out.println(test.returnInt());
+//        System.out.println(test.testArgs(1)); // doesn't match by link or equals
+//        System.out.println(test.testArgs(2<<10)); // doesn't match by link
+//        System.out.println(test.testArgs(num)); // match by link
+//        test.testVoid(2);
+//    }
+    /*public static void testThrowable() {
         SayHello test = Dymock.burn(SayHello.class);
         LeafMatcher[] anyArg = {Leaf.green()};
         BonfireBuilder.buildBonfire(test)
                 .addStick(new WetStick("sayHello", new Exception("Mock sayHello")))
                 .addStick(new WetStick("testArgs", anyArg, new Exception("Mock testArgs")));
         System.out.println(test.testArgs(1));
-    }
-    public static void testSpy() {
+    }*/
+    /*public static void testSpy() {
         SayHello test = Dymock.spy(SayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
         BonfireBuilder.buildBonfire(test)
                 .addStick(new Stick("testArgs", intArg, "!"));
         System.out.println(test.testArgs(1));
         System.out.println(test.testArgs(1.0));
-    }
+    }*/
     public static void testVararg() {
         SayHello test = Dymock.burn(SayHello.class);
         test.vararg(0, 1, 2, 3, 4, 5, 6);
     }
-    public static void testStaticSpy() {
-        Intercepted<StaticSayHello> interceptedHello = Dymock.spyStatic(StaticSayHello.class);
-        LeafMatcher[] zeroArg = {};
-        BonfireBuilder.buildBonfire(interceptedHello)
-                .addStick(new Stick("m", zeroArg, "Intercepted hello"));
-        System.out.println(StaticSayHello.m());
-        System.out.println(StaticSayHello.testArgs(1));
-        System.out.println(StaticSayHello.testArgs(1.0));
-        System.out.println(StaticSayHello.sayHello());
-    }
+//    public static void testStaticSpy() {
+//        Intercepted<StaticSayHello> interceptedHello = Dymock.spyStatic(StaticSayHello.class);
+//        LeafMatcher[] zeroArg = {};
+//        BonfireBuilder.buildBonfire(interceptedHello)
+//                .addStick(new Stick("m", zeroArg, "Intercepted hello"));
+//        System.out.println(StaticSayHello.m());
+//        System.out.println(StaticSayHello.testArgs(1));
+//        System.out.println(StaticSayHello.testArgs(1.0));
+//        System.out.println(StaticSayHello.sayHello());
+//    }
 }

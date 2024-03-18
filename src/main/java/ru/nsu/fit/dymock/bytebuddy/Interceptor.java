@@ -21,10 +21,19 @@ public class Interceptor<T> {
         this.mocked = mocked;
         this.isSpy = isSpy;
     }
-
+    //for interfaces
+    @RuntimeType
+    public Object invoke(@Origin Method invokedMethod,
+                         @AllArguments Object[] arguments) throws Throwable {
+        return intercept(invokedMethod, null, arguments);
+    }
     @RuntimeType
     public Object invoke(@Origin Method invokedMethod, @SuperCall Callable<?> originalCall,
                          @AllArguments Object[] arguments) throws Throwable {
+        return intercept(invokedMethod, originalCall, arguments);
+    }
+    public Object intercept(Method invokedMethod, Callable<?> originalCall,
+                            Object[] arguments) throws Throwable {
         countCalls++;
         String name = invokedMethod.getName();
         MethodInterceptionInfo interceptionInfo = mapping.get(name);
@@ -39,7 +48,7 @@ public class Interceptor<T> {
                 return stick.getResult();
             }
         }
-        if (isSpy)
+        if (originalCall != null && isSpy)
             return originalCall.call();
         var returnType = invokedMethod.getReturnType();
         if(!returnType.equals(Void.TYPE)){
