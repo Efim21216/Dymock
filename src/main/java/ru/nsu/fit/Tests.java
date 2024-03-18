@@ -183,4 +183,16 @@ public class Tests {
                 .addStick(new WetStick("testArgs", anyArg, new Exception("Mock testArgs")));
         System.out.println(test.testArgs(1));
     }
+    public static void testCountCalls() {
+        SayHello test = Dymock.spy(SayHello.class);
+        LeafMatcher[] intArg = {Leaf.green(Integer.class)};
+        BonfireBuilder.buildBonfire(test)
+                .addStick(new Stick("testArgs", intArg, "!"));
+        System.out.println(test.testArgs(1));
+        System.out.println(test.testArgs(1.0));
+    }
+    public static void testVararg() {
+        SayHello test = Dymock.burn(SayHello.class);
+        test.vararg(0, 1, 2, 3, 4, 5, 6);
+    }
 }

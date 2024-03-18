@@ -1,5 +1,7 @@
 package ru.nsu.fit.testclasses;
 
+import java.util.Arrays;
+
 public class SayHello {
     public String sayHello() {
         return "Hello!";
@@ -15,5 +17,8 @@ public class SayHello {
     }
     public void testVoid(int a) {
         System.out.println(a);
+    }
+    public int vararg(int a, int... b) {
+        return a + Arrays.stream(b).sum();
     }
 }

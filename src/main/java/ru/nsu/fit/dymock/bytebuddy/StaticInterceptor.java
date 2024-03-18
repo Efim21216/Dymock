@@ -3,6 +3,7 @@ package ru.nsu.fit.dymock.bytebuddy;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
 import ru.nsu.fit.dymock.matchers.Stick;
+import ru.nsu.fit.dymock.matchers.WetStick;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -21,7 +22,7 @@ public class StaticInterceptor {
     public static Object onMethodEnd(@Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object value,
                                      @Advice.Origin Method method,
                                      @Advice.AllArguments Object[] arguments
-    ) {
+    ) throws Throwable {
         String name = method.getName();
         StaticInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass());
         if (interceptionInfo == null)
@@ -31,6 +32,9 @@ public class StaticInterceptor {
         Stick stick = interceptionInfo.getSuitableStick(name, arguments);
         if (stick != null) {
             interceptionInfo.incrementLocalCountCalls(stick);
+            if (stick instanceof WetStick) {
+                throw ((WetStick) stick).getResult();
+            }
             value = stick.getResult();
             return value;
         }
