@@ -23,7 +23,14 @@ public class Dymock {
             ByteBuddyAgent.install();
             isAgentInstalled = true;
         }
-        return maker.createStaticMock(classToMock);
+        return maker.createStaticMock(classToMock, false);
+    }
+    public static <T> Intercepted<T> spyStatic(Class<T> classToMock) {
+        if (!isAgentInstalled) {
+            ByteBuddyAgent.install();
+            isAgentInstalled = true;
+        }
+        return maker.createStaticMock(classToMock, true);
     }
     public static <T, R> Stick stick(Class<T> mockedClass, String methodName,
                                      List<LeafMatcher> matchers, R returnValue) {

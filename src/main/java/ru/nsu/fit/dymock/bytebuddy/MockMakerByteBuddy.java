@@ -34,14 +34,14 @@ public class MockMakerByteBuddy implements MockMaker {
     }
 
     @Override
-    public <T> Intercepted<T> createStaticMock(Class<T> classToMock) {
+    public <T> Intercepted<T> createStaticMock(Class<T> classToMock, boolean isSpy) {
         new ByteBuddy()
                 .redefine(classToMock)
                 .visit(Advice.to(StaticInterceptor.class).on(not(isDeclaredBy(Object.class)).and(isStatic())))
                 .make()
                 .load(classToMock.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
 
-        StaticInterceptor.addIntercepted(classToMock);
+        StaticInterceptor.addIntercepted(classToMock, isSpy);
         return new Intercepted<>(classToMock);
     }
 }

@@ -7,6 +7,15 @@ import java.util.*;
 public class StaticInterceptionInfo {
     private final Map<String, MethodInterceptionInfo> mapping = new HashMap<>();
     private int classCountCalls = 0;
+    private final boolean isSpy;
+
+    public StaticInterceptionInfo(boolean isSpy) {
+        this.isSpy = isSpy;
+    }
+
+    public boolean isSpy() {
+        return isSpy;
+    }
 
     public Map<String, MethodInterceptionInfo> getMapping() {
         return mapping;

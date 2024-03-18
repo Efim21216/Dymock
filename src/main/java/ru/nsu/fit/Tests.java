@@ -183,7 +183,7 @@ public class Tests {
                 .addStick(new WetStick("testArgs", anyArg, new Exception("Mock testArgs")));
         System.out.println(test.testArgs(1));
     }
-    public static void testCountCalls() {
+    public static void testSpy() {
         SayHello test = Dymock.spy(SayHello.class);
         LeafMatcher[] intArg = {Leaf.green(Integer.class)};
         BonfireBuilder.buildBonfire(test)
@@ -194,5 +194,15 @@ public class Tests {
     public static void testVararg() {
         SayHello test = Dymock.burn(SayHello.class);
         test.vararg(0, 1, 2, 3, 4, 5, 6);
+    }
+    public static void testStaticSpy() {
+        Intercepted<StaticSayHello> interceptedHello = Dymock.spyStatic(StaticSayHello.class);
+        LeafMatcher[] zeroArg = {};
+        BonfireBuilder.buildBonfire(interceptedHello)
+                .addStick(new Stick("m", zeroArg, "Intercepted hello"));
+        System.out.println(StaticSayHello.m());
+        System.out.println(StaticSayHello.testArgs(1));
+        System.out.println(StaticSayHello.testArgs(1.0));
+        System.out.println(StaticSayHello.sayHello());
     }
 }

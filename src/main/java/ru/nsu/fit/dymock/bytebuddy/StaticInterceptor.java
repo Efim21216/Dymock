@@ -14,14 +14,10 @@ public class StaticInterceptor {
     private static final Map<Class<?>, StaticInterceptionInfo> classMap = new HashMap<>();
 
     @Advice.OnMethodEnter(skipOn = Advice.OnDefaultValue.class)
-    public static Object onMethodBegin() {
-        return null;
-    }
-
-    @Advice.OnMethodExit
-    public static Object onMethodEnd(@Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object value,
-                                     @Advice.Origin Method method,
-                                     @Advice.AllArguments Object[] arguments
+    public static Object onMethodBegin(
+            @Advice.Origin Method method,
+            @Advice.AllArguments Object[] arguments,
+            @Advice.Local("result") Object localVariable
     ) throws Throwable {
         String name = method.getName();
         StaticInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass());
@@ -35,10 +31,28 @@ public class StaticInterceptor {
             if (stick instanceof WetStick) {
                 throw ((WetStick) stick).getResult();
             }
-            value = stick.getResult();
+            localVariable = stick.getResult();
+            return null;
+        }
+        localVariable = null;
+        if (interceptionInfo.isSpy())
+            return "default call";
+        else
+            return null;
+    }
+
+    @Advice.OnMethodExit
+    public static Object onMethodEnd(@Advice.Return(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object value,
+                                     @Advice.Origin Method method,
+                                     @Advice.Local("result") Object localVariable
+    ) throws Throwable {
+        if (localVariable != null) {
+            value = localVariable;
             return value;
         }
-
+        StaticInterceptionInfo interceptionInfo = StaticInterceptor.getClassRules(method.getDeclaringClass());
+        if (interceptionInfo.isSpy())
+            return value;
         var returnType = method.getReturnType();
         if(!returnType.equals(Void.TYPE))
             value = getDefaultValue(returnType);
@@ -57,7 +71,7 @@ public class StaticInterceptor {
         return classMap.get(clazz);
     }
 
-    public static void addIntercepted(Class<?> clazz){
-        classMap.put(clazz, new StaticInterceptionInfo());
+    public static void addIntercepted(Class<?> clazz, boolean isSpy){
+        classMap.put(clazz, new StaticInterceptionInfo(isSpy));
     }
 }
