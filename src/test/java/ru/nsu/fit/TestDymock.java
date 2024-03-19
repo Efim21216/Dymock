@@ -159,10 +159,12 @@ public class TestDymock {
 
         Assertions.assertEquals(0,  StaticMethod.plus(10, 1));
         Assertions.assertEquals(1.1,  StaticMethod.plus(10.0, 1));
+        StaticMethod.sub(0, 0);
         
         Assertions.assertTrue(intStick.bask(Dymock.exactly(1)));
         Assertions.assertTrue(doubleStick.bask(Dymock.exactly(1)));
         Assertions.assertTrue(Dymock.ignited(mock, "plus", Dymock.exactly(2)));
+        Assertions.assertTrue(Dymock.ignited(mock, Dymock.exactly(3)));
     }
     @Test
     public void testStringFail(){
