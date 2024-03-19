@@ -22,7 +22,7 @@ public class MethodInterceptionInfo {
     }
 
     public void incrementLocalStick(Stick stick){
-        sticks.get(sticks.indexOf(stick)).incrementCountCalls();
+        stick.incrementCountCalls();        
     }
     public void incrementMethodCallCount() {
         countCalls++;
