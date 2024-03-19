@@ -74,9 +74,17 @@ public class Interceptor<T> {
             info.addStick(stick);
     }
     public int getLocalCountCalls(Stick stick) {
-        return mapping.get(stick.getMethodName()).getLocalCallCount(stick);
+        var info = mapping.get(stick.getMethodName());
+        if(info == null){
+            return 0;
+        }
+        return info.getLocalCallCount(stick);
     }
     public int getMethodCountCalls(String methodName) {
+        var info = mapping.get(methodName);
+        if(info == null){
+            return 0;
+        }
         return mapping.get(methodName).getMethodCallCount();
     }
 }
