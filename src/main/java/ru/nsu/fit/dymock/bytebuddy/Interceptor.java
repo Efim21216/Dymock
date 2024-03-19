@@ -1,6 +1,7 @@
 package ru.nsu.fit.dymock.bytebuddy;
 
 import net.bytebuddy.implementation.bind.annotation.*;
+import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.dymock.matchers.WetStick;
 
@@ -69,7 +70,15 @@ public class Interceptor<T> {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(List.of(stick))));
+            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(List.of(stick)), new ArrayList<>()));
+        else
+            info.addStick(stick);
+    }
+    public void addPartialStick(PartialStick stick) {
+        String name = stick.getMethodName();
+        MethodInterceptionInfo info = mapping.get(name);
+        if (info == null)
+            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(), new ArrayList<>(List.of(stick))));
         else
             info.addStick(stick);
     }

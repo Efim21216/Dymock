@@ -107,6 +107,26 @@ public class Leaf {
         }
     }
 
+    public class PartialLeaf{
+        private String paramName;
+        private LeafMatcher matcher;
+        public PartialLeaf(String paramName, LeafMatcher matcher){
+            this.paramName = paramName;
+            this.matcher = matcher;
+        }
+        public boolean matches(String actualName, Object actual){
+            if(!this.paramName.equals(actualName))
+                return false;
+            return matcher.matches(actual);
+        }
+        public String getParamName(){
+            return this.paramName;
+        }
+        public LeafMatcher getMatcher(){
+            return this.matcher;
+        }
+    }
+
     public static LeafMatcher green(){
         return INSTANCE.new GreenLeaf();
     }
@@ -145,5 +165,9 @@ public class Leaf {
 
     public static LimitLeaf limit(double threshold){
         return INSTANCE.new LimitLeaf(threshold);
+    }
+
+    public static PartialLeaf partial(String paramName, LeafMatcher matcher){
+        return INSTANCE.new PartialLeaf(paramName, matcher);
     }
 }
