@@ -118,10 +118,14 @@ public class Leaf {
 
         @Override
         public boolean matches(Object actual) {
+            if(matchers.length == 0) 
+                return true;
+
             for (LeafMatcher matcher : matchers) {
-                if(!matcher.matches(actual)) return false;
+                if(matcher.matches(actual)) 
+                    return true;
             }
-            return true;
+            return false;
         }
     }
 
