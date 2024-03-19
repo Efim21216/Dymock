@@ -138,5 +138,6 @@ hs_err_pid*
 replay_pid*
 
 TEST*
+settings.json
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij
