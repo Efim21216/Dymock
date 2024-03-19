@@ -138,6 +138,7 @@ public class TestDymock {
         Assertions.assertTrue(intStick.bask(Dymock.exactly(2)));
         Assertions.assertTrue(doubleStick.bask(Dymock.exactly(1)));
         Assertions.assertTrue(twoArgsStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(5))); // counts missed calls
 
         Foo anotherMock = Dymock.burn(Foo.class);
         Assertions.assertFalse(Dymock.ignited(anotherMock, intStick));
