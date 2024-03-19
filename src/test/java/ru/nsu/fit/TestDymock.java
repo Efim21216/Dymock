@@ -149,6 +149,22 @@ public class TestDymock {
         Assertions.assertTrue(Dymock.ignited(mock, twoArgsStick));
     }
     @Test
+    public void testStaticOverload(){
+        Intercepted<StaticMethod> mock = Dymock.burnDown(StaticMethod.class);
+        Stick intStick = new Stick("plus", 0, Leaf.green(Integer.class), Leaf.green(Integer.class));
+        Stick doubleStick = new Stick("plus", 1.1, Leaf.green(Double.class), Leaf.green(Double.class));
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(intStick)
+                .addStick(doubleStick);
+
+        Assertions.assertEquals(0,  StaticMethod.plus(10, 1));
+        Assertions.assertEquals(1.1,  StaticMethod.plus(10.0, 1));
+        
+        Assertions.assertTrue(intStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(doubleStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(Dymock.ignited(mock, "plus", Dymock.exactly(2)));
+    }
+    @Test
     public void testStringFail(){
         StringFoo mock = Dymock.burn(StringFoo.class);
         Stick stringStick = new Stick("echoInt", 1, Leaf.green(String.class));
