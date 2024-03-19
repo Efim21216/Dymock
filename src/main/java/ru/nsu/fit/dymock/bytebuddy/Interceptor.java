@@ -48,6 +48,11 @@ public class Interceptor<T> {
                 }
                 return stick.getResult();
             }
+            PartialStick partialStick = mapping.get(name).getSuitablePartialStick(invokedMethod.getParameters(), arguments);
+            if (partialStick != null) {
+                interceptionInfo.incrementLocalStick(partialStick);
+                return partialStick.getResult();
+            }
         }
         if (originalCall != null && isSpy)
             return originalCall.call();
@@ -80,7 +85,7 @@ public class Interceptor<T> {
         if (info == null)
             mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(), new ArrayList<>(List.of(stick))));
         else
-            info.addStick(stick);
+            info.addPartialStick(stick);
     }
     public int getLocalCountCalls(Stick stick) {
         var info = mapping.get(stick.getMethodName());

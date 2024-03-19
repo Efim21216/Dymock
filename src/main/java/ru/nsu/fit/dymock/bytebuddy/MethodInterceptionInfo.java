@@ -13,7 +13,7 @@ import java.lang.reflect.Parameter;
  */
 public class MethodInterceptionInfo {
     private final List<Stick> sticks;
-    private final List<Stick> partialSticks;
+    private final List<PartialStick> partialSticks;
     private int countCalls = 0;
 
 
@@ -44,9 +44,9 @@ public class MethodInterceptionInfo {
         return result.get(result.size() - 1);
     }
 
-    public Stick getSuitableUniversalStick(Parameter[] parameters, Object[] arguments) {
-        List<Stick> result = sticks.stream()
-                .filter(stick -> stick.matchesLeaves(arguments))
+    public PartialStick getSuitablePartialStick(Parameter[] parameters, Object[] arguments) {
+        List<PartialStick> result = partialSticks.stream()
+                .filter(stick -> stick.matchesPartialLeaves(parameters, arguments))
                 .collect(Collectors.toList());
         if (result.size() == 0)
             return null;

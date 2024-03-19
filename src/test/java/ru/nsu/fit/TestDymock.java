@@ -6,6 +6,8 @@ import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
+import ru.nsu.fit.dymock.matchers.LeafMatcher;
+import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 
 public class TestDymock {
@@ -178,5 +180,27 @@ public class TestDymock {
         mock.echoInt("321"); // enters Interceptor.getMethodCountCalls() somehow
         Assertions.assertTrue(intStringStick.bask(Dymock.exactly(1)));
         Assertions.assertTrue(stringStick.bask(Dymock.exactly(1)));
+    }
+    @Test
+    public void testPartial(){
+        Foo mock = Dymock.burn(Foo.class);
+
+        PartialStick firstArgStick = new PartialStick("echoInt", 1, Leaf.partial("a", Leaf.yellow(1)));
+        PartialStick secondArgStick = new PartialStick("echoInt", 2, Leaf.partial("b", Leaf.yellow(1)));
+        BonfireBuilder.buildBonfire(mock)
+            .addPartialStick(firstArgStick)
+            .addPartialStick(secondArgStick);
+        Assertions.assertEquals(1, mock.echoInt(1));
+        Assertions.assertEquals(1, mock.echoInt(1, 0));
+        Assertions.assertEquals(2, mock.echoInt(1, 1));
+    }
+    @Test
+    public void testPartialStatic(){
+        Intercepted<StaticMethod> mock = Dymock.burnDown(StaticMethod.class);
+        PartialStick doubleStick = new PartialStick("plus", 1.1, Leaf.partial("a", Leaf.yellow(1.0)));
+        BonfireBuilder.buildBonfire(mock).addPartialStick(doubleStick);
+
+        Assertions.assertEquals(1.1, StaticMethod.plus(1.0));
+        Assertions.assertEquals(1.1, StaticMethod.plus(1.0, 0));
     }
 }

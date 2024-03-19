@@ -2,6 +2,7 @@ package ru.nsu.fit.dymock.bytebuddy;
 
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
+import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.dymock.matchers.WetStick;
 
@@ -32,6 +33,12 @@ public class FinalInterceptor {
                 throw ((WetStick) stick).getResult();
             }
             localVariable = stick.getResult();
+            return null;
+        }
+        PartialStick partialStick = mockMap.get(name).getSuitablePartialStick(name, method.getParameters(), arguments);
+        if (partialStick != null) {
+            interceptionInfo.incrementLocalCountCalls(partialStick);
+            localVariable = partialStick.getResult();
             return null;
         }
         localVariable = null;
@@ -66,6 +73,9 @@ public class FinalInterceptor {
 
     public static void addStick(Stick stick, Object mock) throws IllegalStateException{
         mockMap.get(mock).addStick(stick);
+    }
+    public static void addPartialStick(PartialStick stick, Object mock) throws IllegalStateException{
+        mockMap.get(mock).addPartialStick(stick);
     }
 
     public static StaticInterceptionInfo getObjectRules(Object mock) {
