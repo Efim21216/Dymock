@@ -147,4 +147,13 @@ public class TestDymock {
         Assertions.assertFalse(Dymock.ignited(anotherMock, twoArgsStick));
         Assertions.assertTrue(Dymock.ignited(mock, twoArgsStick));
     }
+    @Test
+    public void testStringFail(){
+        StringFoo mock = Dymock.burn(StringFoo.class);
+        Stick stringStick = new Stick("echoInt", 1, Leaf.green(String.class));
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(stringStick);
+        mock.echoInt("321"); // enters Interceptor.getMethodCountCalls() somehow
+        Assertions.assertTrue(stringStick.bask(Dymock.exactly(1)));
+    }
 }
