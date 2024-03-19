@@ -7,6 +7,12 @@ public class Foo {
     public int echoInt(int a) {
         return a;
     }
+    public int echoInt(int a, int b) {
+        return a + b;
+    }
+    public int echoInt(double d){
+        return (int)d;
+    }
     public String helloBar(Bar bar) {
         return "Hello, " + bar.name;
     }

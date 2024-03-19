@@ -118,4 +118,33 @@ public class TestDymock {
                 .addStick(new Stick("plus", 1.0, Leaf.yellow(1.0), Leaf.yellow(1.0)));
         Assertions.assertEquals(2.0, useStaticMethod.advancedSum(1.0, 1.0));
     }
+    @Test
+    public void testOverloadBask(){
+        Foo mock = Dymock.burn(Foo.class);
+        Stick intStick = new Stick("echoInt", 0, Leaf.green(Integer.class));
+        Stick doubleStick = new Stick("echoInt", 1, Leaf.green(Double.class));
+        Stick twoArgsStick = new Stick("echoInt", 2, Leaf.yellow(0), Leaf.yellow(0));
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(intStick)
+                .addStick(doubleStick)
+                .addStick(twoArgsStick);
+
+        mock.echoInt(0);
+        mock.echoInt(1);
+        mock.echoInt(0.1);
+        mock.echoInt(0, 0);
+        mock.echoInt(1, 1);
+        
+        Assertions.assertTrue(intStick.bask(Dymock.exactly(2)));
+        Assertions.assertTrue(doubleStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(twoArgsStick.bask(Dymock.exactly(1)));
+
+        Foo anotherMock = Dymock.burn(Foo.class);
+        Assertions.assertFalse(Dymock.ignited(anotherMock, intStick));
+        Assertions.assertTrue(Dymock.ignited(mock, intStick));
+        Assertions.assertFalse(Dymock.ignited(anotherMock, doubleStick));
+        Assertions.assertTrue(Dymock.ignited(mock, doubleStick));
+        Assertions.assertFalse(Dymock.ignited(anotherMock, twoArgsStick));
+        Assertions.assertTrue(Dymock.ignited(mock, twoArgsStick));
+    }
 }
