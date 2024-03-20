@@ -219,4 +219,15 @@ public class TestDymock {
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0));
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0, 0));
     }
+    @Test
+    public void testCustomLeaf(){
+        StringFoo mock = Dymock.burn(StringFoo.class);
+        Stick stringStick = new Stick("echoInt", 1, new SubstringLeaf("Hello"));
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(stringStick);
+
+        Assertions.assertEquals(1, mock.echoInt("Hello"));
+        Assertions.assertEquals(1, mock.echoInt("ell"));
+        Assertions.assertEquals(0, mock.echoInt("elll"));
+    }
 }
