@@ -304,9 +304,8 @@ public class TestDymock {
         StaticMethod.plus(0, 0);
         Assertions.assertTrue(Dymock.ignited(staticMock, "plus", Dymock.exactly(3)));
 
-        // FinalIntercepted<FinalClass> finalMock = Dymock.spyFinal(FinalClass.class);
-        // FinalClass finalMockObject = finalMock.getMock();
-        // finalMockObject.isDivisor(5, 6);
-        // Assertions.assertTrue(Dymock.ignited(finalMock, "isDivisor", Dymock.exactly(1)));
+        FinalClass finalMock = Dymock.spy(FinalClass.class);
+        finalMock.isDivisor(5, 6);
+        Assertions.assertTrue(Dymock.ignited(finalMock, "isDivisor", Dymock.exactly(1)));
     }
 }
