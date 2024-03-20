@@ -35,7 +35,7 @@ public class FinalInterceptor {
             localVariable = stick.getResult();
             return null;
         }
-        PartialStick partialStick = mockMap.get(name).getSuitablePartialStick(name, method.getParameters(), arguments);
+        PartialStick partialStick = interceptionInfo.getSuitablePartialStick(name, method.getParameters(), arguments);
         if (partialStick != null) {
             interceptionInfo.incrementLocalCountCalls(partialStick);
             localVariable = partialStick.getResult();
