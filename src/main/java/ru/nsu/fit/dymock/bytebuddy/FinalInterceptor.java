@@ -25,7 +25,7 @@ public class FinalInterceptor {
         if (interceptionInfo == null)
             return "default call";
         interceptionInfo.incrementClassCountCalls();
-        interceptionInfo.incrementMethodCountCalls(name, arguments);
+        interceptionInfo.incrementMethodCountCalls(name);
         Stick stick = interceptionInfo.getSuitableStick(name, arguments);
         if (stick != null) {
             interceptionInfo.incrementLocalCountCalls(stick);

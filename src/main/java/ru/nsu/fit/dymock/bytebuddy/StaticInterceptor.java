@@ -25,7 +25,7 @@ public class StaticInterceptor {
         if (interceptionInfo == null)
             throw new IllegalStateException("Interception info for static is null");
         interceptionInfo.incrementClassCountCalls();
-        interceptionInfo.incrementMethodCountCalls(name, arguments);
+        interceptionInfo.incrementMethodCountCalls(name);
         Stick stick = interceptionInfo.getSuitableStick(name, arguments);
         if (stick != null) {
             interceptionInfo.incrementLocalCountCalls(stick);

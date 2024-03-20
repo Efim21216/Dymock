@@ -3,8 +3,11 @@ package ru.nsu.fit.dymock;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import ru.nsu.fit.dymock.bytebuddy.*;
 import ru.nsu.fit.dymock.matchers.Stick;
+import ru.nsu.fit.dymock.matchers.LeafMatcher;
 
 import java.lang.reflect.Modifier;
+import java.util.List;
+
 public class Dymock {
     private static final Dymock INSTANCE = new Dymock();
 
@@ -44,21 +47,22 @@ public class Dymock {
         }
         return maker.createStaticMock(classToMock, true);
     }
-
+    public static <T, R> Stick stick(Class<T> mockedClass, String methodName,
+                                     List<LeafMatcher> matchers, R returnValue) {
+        return null;
+    }
+    public static <T> Stick wetStick(Class<T> mockedClass, String methodName,
+                                     List<LeafMatcher> matchers, Throwable throwable) {
+        return null;
+    }
     public static boolean ignited(Object mock) {
         if (mock instanceof InterceptionAccessor
             && ((InterceptionAccessor<?>) mock).getInterceptor().getCountCalls() > 0) {
             return true;
         }
-        if (mock instanceof Intercepted) {
-            return StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz())
-                    .getClassCountCalls() > 0;
-        }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        int calls = info.getClassCountCalls();
-        return calls > 0;
+        return mock instanceof Intercepted &&
+                StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz())
+                        .getClassCountCalls() > 0;
     }
     public static boolean ignited(Object mock, Basker basker) {
         if (mock instanceof InterceptionAccessor){
@@ -69,11 +73,7 @@ public class Dymock {
             int calls = StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz()).getClassCountCalls();
             return basker.fits(calls);
         }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        int calls = info.getClassCountCalls();
-        return basker.fits(calls);
+        return false;
     }
     public static boolean ignited(Object mock, Stick stick) {
         if (mock instanceof InterceptionAccessor) {
@@ -83,11 +83,7 @@ public class Dymock {
             return StaticInterceptor.getClassRules(((Intercepted<?>) mock)
                     .getClazz()).getLocalCountCalls(stick) > 0;
         }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        int calls = info.getLocalCountCalls(stick);
-        return calls > 0;
+        return false;
     }
     public static boolean ignited(Object mock, Stick stick, Basker basker) {
         if (mock instanceof InterceptionAccessor){
@@ -98,11 +94,7 @@ public class Dymock {
             int calls = StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz()).getLocalCountCalls(stick);
             return basker.fits(calls);
         }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        int calls = info.getLocalCountCalls(stick);
-        return basker.fits(calls);
+        return false;
     }
     public static boolean ignited(Object mock, String methodName) {
         if (mock instanceof InterceptionAccessor) {
@@ -112,11 +104,7 @@ public class Dymock {
             return StaticInterceptor.getClassRules(((Intercepted<?>) mock)
                     .getClazz()).getMethodCountCalls(methodName) > 0;
         }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        int calls = info.getMethodCountCalls(methodName);
-        return calls > 0;
+        return false;
     }
     public static boolean ignited(Object mock, String methodName, Basker basker) {
         if (mock instanceof InterceptionAccessor){
@@ -131,41 +119,7 @@ public class Dymock {
             int calls = StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz()).getMethodCountCalls(methodName);
             return basker.fits(calls);
         }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        int calls = info.getMethodCountCalls(methodName);
-        return basker.fits(calls);
-    }
-    public static boolean ignited(Object mock, String methodName, Class<?>... arguments) {
-        if (mock instanceof InterceptionAccessor){
-            return ((InterceptionAccessor<?>) mock).getInterceptor().getSignatureCountCalls(methodName, arguments) > 0;
-        }
-        if (mock instanceof Intercepted) {
-            int calls = StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz())
-                    .getSignatureCountCalls(methodName, arguments);
-            return calls > 0;
-        }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        return info.getSignatureCountCalls(methodName, arguments) > 0;
-    }
-    public static boolean ignited(Object mock, String methodName, Basker basker, Class<?>... arguments) {
-        if (mock instanceof InterceptionAccessor){
-            int calls = ((InterceptionAccessor<?>) mock).getInterceptor().getSignatureCountCalls(methodName, arguments);
-            return basker.fits(calls);
-        }
-        if (mock instanceof Intercepted) {
-            int calls = StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz())
-                    .getSignatureCountCalls(methodName, arguments);
-            return basker.fits(calls);
-        }
-        StaticInterceptionInfo info = FinalInterceptor.getObjectRules(mock);
-        if (info == null)
-            return false;
-        int calls = info.getSignatureCountCalls(methodName, arguments);
-        return basker.fits(calls);
+        return false;
     }
 
     public class ExactBasker implements Basker {

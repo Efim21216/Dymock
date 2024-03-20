@@ -1,13 +1,10 @@
 package ru.nsu.fit.dymock.bytebuddy;
 
-import ru.nsu.fit.dymock.matchers.MethodSignature;
 import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.lang.reflect.Parameter;
 
@@ -17,21 +14,25 @@ import java.lang.reflect.Parameter;
 public class MethodInterceptionInfo {
     private final List<Stick> sticks;
     private final List<PartialStick> partialSticks;
-    public final Map<MethodSignature, Integer> signatureCalls = new HashMap<>();
     private int countCalls = 0;
-    private final String methodName;
 
 
-    public MethodInterceptionInfo(List<Stick> sticks, List<PartialStick> partialSticks, String methodName) {
+    public MethodInterceptionInfo(List<Stick> sticks, List<PartialStick> partialSticks) {
         this.sticks = new LinkedList<>();
         this.partialSticks = new LinkedList<>();
-        this.methodName = methodName;
-        this.sticks.addAll(sticks);
-        this.partialSticks.addAll(partialSticks);
+        for (Stick stick : sticks) {
+            this.sticks.add(stick);
+        }
+        for (PartialStick universalStick : partialSticks) {
+            this.partialSticks.add(universalStick);
+        }
     }
 
     public void incrementLocalStick(Stick stick){
         stick.incrementCountCalls();        
+    }
+    public void incrementMethodCallCount() {
+        countCalls++;
     }
 
     public Stick getSuitableStick(Object[] arguments) {
@@ -66,19 +67,5 @@ public class MethodInterceptionInfo {
 
     public void addPartialStick(PartialStick partialStick){
         partialSticks.add(partialStick);
-    }
-    public void incrementCalls(Object[] arguments) {
-        countCalls++;
-        MethodSignature signature = new MethodSignature(methodName, arguments);
-        if (signatureCalls.containsKey(signature))
-            signatureCalls.put(signature, signatureCalls.get(signature) + 1);
-        else
-            signatureCalls.put(signature, 1);
-    }
-    public int getSignatureCalls(Class<?>[] args) {
-        Integer result = signatureCalls.get(new MethodSignature(methodName, args));
-        if (result == null)
-            return 0;
-        return result;
     }
 }

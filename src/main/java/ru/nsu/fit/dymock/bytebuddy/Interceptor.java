@@ -17,6 +17,7 @@ public class Interceptor<T> {
 
     public final Class<T> mocked;
     public final boolean isSpy;
+
     public Interceptor(Class<T> mocked, boolean isSpy) {
         this.mocked = mocked;
         this.isSpy = isSpy;
@@ -39,8 +40,13 @@ public class Interceptor<T> {
         countCalls++;
         String name = invokedMethod.getName();
         MethodInterceptionInfo interceptionInfo = mapping.get(name);
-        if (interceptionInfo != null) {
-            interceptionInfo.incrementCalls(arguments);
+        if(interceptionInfo == null){
+            var info = new MethodInterceptionInfo(new ArrayList<>(), new ArrayList<>());
+            info.incrementMethodCallCount();
+            mapping.put(name, info);
+        }
+        else {
+            interceptionInfo.incrementMethodCallCount();
             Stick stick = mapping.get(name).getSuitableStick(arguments);
             if (stick != null) {
                 interceptionInfo.incrementLocalStick(stick);
@@ -54,11 +60,6 @@ public class Interceptor<T> {
                 interceptionInfo.incrementLocalStick(partialStick);
                 return partialStick.getResult();
             }
-        } else {
-            interceptionInfo = new MethodInterceptionInfo(Collections.emptyList(),
-                    Collections.emptyList(), name);
-            interceptionInfo.incrementCalls(arguments);
-            mapping.put(name, interceptionInfo);
         }
         if (originalCall != null && isSpy)
             return originalCall.call();
@@ -80,8 +81,7 @@ public class Interceptor<T> {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(List.of(stick)),
-                    new ArrayList<>(), name));
+            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(List.of(stick)), new ArrayList<>()));
         else
             info.addStick(stick);
     }
@@ -89,8 +89,7 @@ public class Interceptor<T> {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(),
-                    new ArrayList<>(List.of(stick)), name));
+            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(), new ArrayList<>(List.of(stick))));
         else
             info.addPartialStick(stick);
     }
@@ -107,8 +106,5 @@ public class Interceptor<T> {
             return 0;
         }
         return mapping.get(methodName).getMethodCallCount();
-    }
-    public int getSignatureCountCalls(String methodName, Class<?>[] arguments) {
-        return mapping.get(methodName).getSignatureCalls(arguments);
     }
 }
