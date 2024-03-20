@@ -6,6 +6,8 @@ import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
+import ru.nsu.fit.dymock.matchers.LeafMatcher;
+import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 
 public class TestDymock {
@@ -117,5 +119,88 @@ public class TestDymock {
         BonfireBuilder.buildBonfire(mock)
                 .addStick(new Stick("plus", 1.0, Leaf.yellow(1.0), Leaf.yellow(1.0)));
         Assertions.assertEquals(2.0, useStaticMethod.advancedSum(1.0, 1.0));
+    }
+    @Test
+    public void testOverloadBask(){
+        Foo mock = Dymock.burn(Foo.class);
+        Stick intStick = new Stick("echoInt", 0, Leaf.green(Integer.class));
+        Stick doubleStick = new Stick("echoInt", 1, Leaf.green(Double.class));
+        Stick twoArgsStick = new Stick("echoInt", 2, Leaf.yellow(0), Leaf.yellow(0));
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(intStick)
+                .addStick(doubleStick)
+                .addStick(twoArgsStick);
+
+        mock.echoInt(0);
+        mock.echoInt(1);
+        mock.echoInt(0.1);
+        mock.echoInt(0, 0);
+        mock.echoInt(1, 1);
+        
+        Assertions.assertTrue(intStick.bask(Dymock.exactly(2)));
+        Assertions.assertTrue(doubleStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(twoArgsStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(5))); // counts missed calls
+
+        Foo anotherMock = Dymock.burn(Foo.class);
+        Assertions.assertFalse(Dymock.ignited(anotherMock, intStick));
+        Assertions.assertTrue(Dymock.ignited(mock, intStick));
+        Assertions.assertFalse(Dymock.ignited(anotherMock, doubleStick));
+        Assertions.assertTrue(Dymock.ignited(mock, doubleStick));
+        Assertions.assertFalse(Dymock.ignited(anotherMock, twoArgsStick));
+        Assertions.assertTrue(Dymock.ignited(mock, twoArgsStick));
+    }
+    @Test
+    public void testStaticOverload(){
+        Intercepted<StaticMethod> mock = Dymock.burnDown(StaticMethod.class);
+        Stick intStick = new Stick("plus", 0, Leaf.green(Integer.class), Leaf.green(Integer.class));
+        Stick doubleStick = new Stick("plus", 1.1, Leaf.green(Double.class), Leaf.green(Double.class));
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(intStick)
+                .addStick(doubleStick);
+
+        Assertions.assertEquals(0,  StaticMethod.plus(10, 1));
+        Assertions.assertEquals(1.1,  StaticMethod.plus(10.0, 1));
+        StaticMethod.sub(0, 0);
+        
+        Assertions.assertTrue(intStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(doubleStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(Dymock.ignited(mock, "plus", Dymock.exactly(2)));
+        Assertions.assertTrue(Dymock.ignited(mock, Dymock.exactly(3)));
+    }
+    @Test
+    public void testStringFail(){
+        StringFoo mock = Dymock.burn(StringFoo.class);
+        Stick stringStick = new Stick("echoInt", 1, Leaf.green(String.class));
+        Stick intStringStick = new Stick("echoInt", 2, Leaf.green(Integer.class), Leaf.green(String.class));
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(stringStick)
+                .addStick(intStringStick);
+        Assertions.assertEquals(1, mock.echoInt("321"));
+        Assertions.assertEquals(2, mock.echoInt(1, "321"));
+        Assertions.assertTrue(intStringStick.bask(Dymock.exactly(1)));
+        Assertions.assertTrue(stringStick.bask(Dymock.exactly(1)));
+    }
+    @Test
+    public void testPartial(){
+        Foo mock = Dymock.burn(Foo.class);
+
+        PartialStick firstArgStick = new PartialStick("echoInt", 1, Leaf.partial("a", Leaf.yellow(1)));
+        PartialStick secondArgStick = new PartialStick("echoInt", 2, Leaf.partial("b", Leaf.yellow(1)));
+        BonfireBuilder.buildBonfire(mock)
+            .addPartialStick(firstArgStick)
+            .addPartialStick(secondArgStick);
+        Assertions.assertEquals(1, mock.echoInt(1));
+        Assertions.assertEquals(1, mock.echoInt(1, 0));
+        Assertions.assertEquals(2, mock.echoInt(1, 1));
+    }
+    @Test
+    public void testPartialStatic(){
+        Intercepted<StaticMethod> mock = Dymock.burnDown(StaticMethod.class);
+        PartialStick doubleStick = new PartialStick("plus", 1.1, Leaf.partial("a", Leaf.yellow(1.0)));
+        BonfireBuilder.buildBonfire(mock).addPartialStick(doubleStick);
+
+        Assertions.assertEquals(1.1, StaticMethod.plus(1.0));
+        Assertions.assertEquals(1.1, StaticMethod.plus(1.0, 0));
     }
 }

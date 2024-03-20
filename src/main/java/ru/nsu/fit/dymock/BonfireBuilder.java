@@ -5,6 +5,7 @@ import ru.nsu.fit.dymock.bytebuddy.FinalInterceptor;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.bytebuddy.InterceptionAccessor;
 import ru.nsu.fit.dymock.bytebuddy.StaticInterceptor;
+import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 
 import java.lang.reflect.Modifier;
@@ -32,6 +33,19 @@ public class BonfireBuilder {
             }
             else
                 FinalInterceptor.addStick(stick, current);
+
+            return this;
+        }
+
+        public Builder addPartialStick(PartialStick stick) {
+            if (current instanceof Intercepted) {
+                StaticInterceptor.addPartialStick(stick, ((Intercepted<?>) current).getClazz());
+            }
+            else if (current instanceof InterceptionAccessor) {
+                ((InterceptionAccessor) current).getInterceptor().addPartialStick(stick);
+            }
+            else
+                FinalInterceptor.addPartialStick(stick, current);
 
             return this;
         }

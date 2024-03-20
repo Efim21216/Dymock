@@ -1,6 +1,7 @@
 package ru.nsu.fit.dymock.bytebuddy;
 
 import net.bytebuddy.implementation.bind.annotation.*;
+import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 import ru.nsu.fit.dymock.matchers.WetStick;
 
@@ -22,11 +23,13 @@ public class Interceptor<T> {
         this.isSpy = isSpy;
     }
     //for interfaces
+    @BindingPriority(1)
     @RuntimeType
     public Object invoke(@Origin Method invokedMethod,
                          @AllArguments Object[] arguments) throws Throwable {
         return intercept(invokedMethod, null, arguments);
     }
+    @BindingPriority(2)
     @RuntimeType
     public Object invoke(@Origin Method invokedMethod, @SuperCall Callable<?> originalCall,
                          @AllArguments Object[] arguments) throws Throwable {
@@ -47,6 +50,11 @@ public class Interceptor<T> {
                 }
                 return stick.getResult();
             }
+            PartialStick partialStick = mapping.get(name).getSuitablePartialStick(invokedMethod.getParameters(), arguments);
+            if (partialStick != null) {
+                interceptionInfo.incrementLocalStick(partialStick);
+                return partialStick.getResult();
+            }
         }
         if (originalCall != null && isSpy)
             return originalCall.call();
@@ -64,19 +72,34 @@ public class Interceptor<T> {
     private static <T> T getDefaultValue(Class<T> clazz) {
         return (T) Array.get(Array.newInstance(clazz, 1), 0);
     }
- 
     public void addStick(Stick stick) {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(List.of(stick))));
+            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(List.of(stick)), new ArrayList<>()));
         else
             info.addStick(stick);
     }
+    public void addPartialStick(PartialStick stick) {
+        String name = stick.getMethodName();
+        MethodInterceptionInfo info = mapping.get(name);
+        if (info == null)
+            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(), new ArrayList<>(List.of(stick))));
+        else
+            info.addPartialStick(stick);
+    }
     public int getLocalCountCalls(Stick stick) {
-        return mapping.get(stick.getMethodName()).getLocalCallCount(stick);
+        var info = mapping.get(stick.getMethodName());
+        if(info == null){
+            return 0;
+        }
+        return info.getLocalCallCount(stick);
     }
     public int getMethodCountCalls(String methodName) {
+        var info = mapping.get(methodName);
+        if(info == null){
+            return 0;
+        }
         return mapping.get(methodName).getMethodCallCount();
     }
 }
