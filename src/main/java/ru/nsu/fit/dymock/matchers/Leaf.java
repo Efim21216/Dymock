@@ -1,5 +1,7 @@
 package ru.nsu.fit.dymock.matchers;
 
+import java.util.Arrays;
+
 public class Leaf {
     private static Leaf INSTANCE = new Leaf();
 
@@ -107,6 +109,26 @@ public class Leaf {
         }
     }
 
+    private class CompositeLeaf extends LeafMatcher{
+        private LeafMatcher[] matchers;
+        public CompositeLeaf(LeafMatcher... matchers){
+            super(Object.class);
+            this.matchers = Arrays.copyOf(matchers, matchers.length);
+        }
+
+        @Override
+        public boolean matches(Object actual) {
+            if(matchers.length == 0)
+                return true;
+
+            for (LeafMatcher matcher : matchers) {
+                if(matcher.matches(actual))
+                    return true;
+            }
+            return false;
+        }
+    }
+
     public class PartialLeaf{
         private String paramName;
         private LeafMatcher matcher;
@@ -169,5 +191,9 @@ public class Leaf {
 
     public static PartialLeaf partial(String paramName, LeafMatcher matcher){
         return INSTANCE.new PartialLeaf(paramName, matcher);
+    }
+
+    public static LeafMatcher combine(LeafMatcher... matchers){
+        return INSTANCE.new CompositeLeaf(matchers);
     }
 }
