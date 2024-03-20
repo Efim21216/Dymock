@@ -33,9 +33,6 @@ public class MethodInterceptionInfo {
     public void incrementLocalStick(Stick stick){
         stick.incrementCountCalls();        
     }
-    public void incrementMethodCallCount() {
-        countCalls++;
-    }
 
     public Stick getSuitableStick(Object[] arguments) {
         List<Stick> result = sticks.stream()
@@ -70,7 +67,8 @@ public class MethodInterceptionInfo {
     public void addPartialStick(PartialStick partialStick){
         partialSticks.add(partialStick);
     }
-    public void incrementSignatureCalls(Object[] arguments) {
+    public void incrementCalls(Object[] arguments) {
+        countCalls++;
         MethodSignature signature = new MethodSignature(methodName, arguments);
         if (signatureCalls.containsKey(signature))
             signatureCalls.put(signature, signatureCalls.get(signature) + 1);

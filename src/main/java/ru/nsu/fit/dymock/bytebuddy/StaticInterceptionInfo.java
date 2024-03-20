@@ -32,6 +32,12 @@ public class StaticInterceptionInfo {
             throw new IllegalArgumentException("Method not found " + methodName);
         return info.getMethodCallCount();
     }
+    public int getSignatureCountCalls(String methodName, Class<?>[] arguments) {
+        MethodInterceptionInfo info = mapping.get(methodName);
+        if (info == null)
+            throw new IllegalArgumentException("Method not found " + methodName);
+        return info.getSignatureCalls(arguments);
+    }
     public int getLocalCountCalls(Stick stick) {
         MethodInterceptionInfo info = mapping.get(stick.getMethodName());
         if (info == null)
@@ -47,10 +53,14 @@ public class StaticInterceptionInfo {
             info.incrementLocalStick(stick);
         }
     }
-    public void incrementMethodCountCalls(String methodName) {
+    public void incrementMethodCountCalls(String methodName, Object[] arguments) {
         MethodInterceptionInfo info = mapping.get(methodName);
         if (info != null) {
-            info.incrementMethodCallCount();
+            info.incrementCalls(arguments);
+        } else {
+            info = new MethodInterceptionInfo(Collections.emptyList(), Collections.emptyList(), methodName);
+            info.incrementCalls(arguments);
+            mapping.put(methodName, info);
         }
     }
     public void addStick(Stick stick) {

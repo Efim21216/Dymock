@@ -40,7 +40,7 @@ public class Interceptor<T> {
         String name = invokedMethod.getName();
         MethodInterceptionInfo interceptionInfo = mapping.get(name);
         if (interceptionInfo != null) {
-            interceptionInfo.incrementMethodCallCount();
+            interceptionInfo.incrementCalls(arguments);
             Stick stick = mapping.get(name).getSuitableStick(arguments);
             if (stick != null) {
                 interceptionInfo.incrementLocalStick(stick);
@@ -57,7 +57,7 @@ public class Interceptor<T> {
         } else {
             interceptionInfo = new MethodInterceptionInfo(Collections.emptyList(),
                     Collections.emptyList(), name);
-            interceptionInfo.incrementSignatureCalls(arguments);
+            interceptionInfo.incrementCalls(arguments);
             mapping.put(name, interceptionInfo);
         }
         if (originalCall != null && isSpy)
