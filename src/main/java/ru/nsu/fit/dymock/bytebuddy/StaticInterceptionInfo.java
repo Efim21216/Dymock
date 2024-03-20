@@ -62,6 +62,7 @@ public class StaticInterceptionInfo {
             info.incrementCalls(arguments);
             mapping.put(methodName, info);
         }
+        info.incrementMethodCallCount();
     }
     public void addStick(Stick stick) {
         MethodInterceptionInfo info = mapping.get(stick.getMethodName());

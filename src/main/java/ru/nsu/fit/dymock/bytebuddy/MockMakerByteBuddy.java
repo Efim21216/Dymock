@@ -19,7 +19,7 @@ public class MockMakerByteBuddy implements MockMaker {
     @Override
     public <T> T createMock(Class<T> classToMock, boolean isSpy, boolean isFinal) {
         if (isFinal) {
-            return createFinalMock(classToMock, isSpy);
+            throw new IllegalStateException("Can't mock final classes like this: use createFinalMock");
         }
         ByteBuddy byteBuddy = new ByteBuddy();
         Interceptor<T> interceptor = new Interceptor<>(classToMock, isSpy);
@@ -37,7 +37,7 @@ public class MockMakerByteBuddy implements MockMaker {
         ((InterceptionAccessor) mock).setInterceptor(interceptor);
         return mock;
     }
-    private <T> T createFinalMock(Class<T> classToMock, boolean isSpy) {
+    public <T> FinalIntercepted<T> createFinalMock(Class<T> classToMock, boolean isSpy) {
         Class<? extends T> mockedClass = new ByteBuddy()
                 .redefine(classToMock)
                 .visit(Advice.to(FinalInterceptor.class).on(not(isDeclaredBy(Object.class)).and(not(isConstructor()))))
@@ -45,7 +45,7 @@ public class MockMakerByteBuddy implements MockMaker {
                 .load(classToMock.getClassLoader(), ClassReloadingStrategy.fromInstalledAgent()).getLoaded();
         T mock = objenesis.newInstance(mockedClass);
         FinalInterceptor.addIntercepted(mock, isSpy);
-        return mock;
+        return new FinalIntercepted<T>(classToMock, mock);
     }
 
     @Override
