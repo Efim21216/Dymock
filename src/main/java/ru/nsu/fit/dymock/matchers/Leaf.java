@@ -104,14 +104,14 @@ public class Leaf {
         public boolean matches(Object actual) {
             double value = ((Number) actual).doubleValue();
             return super.matches(actual) 
-            && value - this.lo_limit > this.THRESHOLD 
-            && this.hi_limit - value > this.THRESHOLD;
+            && value - this.lo_limit + 1 > this.THRESHOLD 
+            && this.hi_limit - value + 1> this.THRESHOLD;
         }
     }
 
-    private class CompositeLeaf extends LeafMatcher{
+    private class CompositeOrLeaf extends LeafMatcher{
         private LeafMatcher[] matchers;
-        public CompositeLeaf(LeafMatcher... matchers){
+        public CompositeOrLeaf(LeafMatcher... matchers){
             super(Object.class);
             this.matchers = Arrays.copyOf(matchers, matchers.length);
         }
@@ -126,6 +126,26 @@ public class Leaf {
                     return true;
             }
             return false;
+        }
+    }
+
+    private class CompositeAndLeaf extends LeafMatcher{
+        private LeafMatcher[] matchers;
+        public CompositeAndLeaf(LeafMatcher... matchers){
+            super(Object.class);
+            this.matchers = Arrays.copyOf(matchers, matchers.length);
+        }
+
+        @Override
+        public boolean matches(Object actual) {
+            if(matchers.length == 0)
+                return true;
+
+            for (LeafMatcher matcher : matchers) {
+                if(!matcher.matches(actual))
+                    return false;
+            }
+            return true;
         }
     }
 
@@ -193,7 +213,11 @@ public class Leaf {
         return INSTANCE.new PartialLeaf(paramName, matcher);
     }
 
-    public static LeafMatcher combine(LeafMatcher... matchers){
-        return INSTANCE.new CompositeLeaf(matchers);
+    public static LeafMatcher or(LeafMatcher... matchers){
+        return INSTANCE.new CompositeOrLeaf(matchers);
+    }
+
+    public static LeafMatcher and(LeafMatcher... matchers){
+        return INSTANCE.new CompositeAndLeaf(matchers);
     }
 }
