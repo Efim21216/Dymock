@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import ru.nsu.fit.dymock.matchers.Leaf.PartialLeaf;
 
@@ -25,7 +26,7 @@ public class PartialStick extends Stick{
     }
 
     public boolean matchesPartialLeaves(Parameter[] parameters, Object[] arguments){
-        List<String> callNames = Arrays.asList(parameters).stream().map(Parameter::getName).toList();
+        List<String> callNames = Arrays.asList(parameters).stream().map(Parameter::getName).collect(Collectors.toList());
         for(String parameterName : leafMap.keySet()){
             int i = callNames.indexOf(parameterName);
             

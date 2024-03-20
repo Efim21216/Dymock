@@ -176,8 +176,8 @@ public class TestDymock {
         BonfireBuilder.buildBonfire(mock)
                 .addStick(stringStick)
                 .addStick(intStringStick);
-        mock.echoInt(1, "321");
-        mock.echoInt("321"); // enters Interceptor.getMethodCountCalls() somehow
+        Assertions.assertEquals(1, mock.echoInt("321"));
+        Assertions.assertEquals(2, mock.echoInt(1, "321"));
         Assertions.assertTrue(intStringStick.bask(Dymock.exactly(1)));
         Assertions.assertTrue(stringStick.bask(Dymock.exactly(1)));
     }

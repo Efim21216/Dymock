@@ -23,11 +23,13 @@ public class Interceptor<T> {
         this.isSpy = isSpy;
     }
     //for interfaces
+    @BindingPriority(1)
     @RuntimeType
     public Object invoke(@Origin Method invokedMethod,
                          @AllArguments Object[] arguments) throws Throwable {
         return intercept(invokedMethod, null, arguments);
     }
+    @BindingPriority(2)
     @RuntimeType
     public Object invoke(@Origin Method invokedMethod, @SuperCall Callable<?> originalCall,
                          @AllArguments Object[] arguments) throws Throwable {
@@ -70,7 +72,6 @@ public class Interceptor<T> {
     private static <T> T getDefaultValue(Class<T> clazz) {
         return (T) Array.get(Array.newInstance(clazz, 1), 0);
     }
- 
     public void addStick(Stick stick) {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
