@@ -141,4 +141,8 @@ TEST*
 settings.json
 *.txt
 *.dumpstream
+
+# Maven
+target/
+
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij

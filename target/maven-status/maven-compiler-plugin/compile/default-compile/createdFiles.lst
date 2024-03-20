@@ -16,6 +16,7 @@ ru\nsu\fit\dymock\bytebuddy\MockMaker.class
 ru\nsu\fit\dymock\matchers\Leaf.class
 ru\nsu\fit\dymock\Dymock$LimitBasker.class
 ru\nsu\fit\testclasses\StaticSayHello.class
+ru\nsu\fit\dymock\matchers\Leaf$CompositeLeaf.class
 ru\nsu\fit\dymock\BonfireBuilder.class
 ru\nsu\fit\dymock\bytebuddy\StaticInterceptionInfo.class
 ru\nsu\fit\dymock\Dymock.class

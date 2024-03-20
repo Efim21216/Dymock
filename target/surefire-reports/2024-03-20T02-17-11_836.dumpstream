@@ -1,5 +1,0 @@
-# Created at 2024-03-20T02:17:12.350
-Boot Manifest-JAR contains absolute paths in classpath 'd:\NSU_programming\Dymock\target\test-classes'
-Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
-'other' has different root
-
