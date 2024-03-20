@@ -120,19 +120,28 @@ public class TestDymock {
         Assertions.assertEquals(2.0, useStaticMethod.advancedSum(1.0, 1.0));
     }
     @Test
-    public void testCompositeCondition(){
+    public void testCompositeOrCondition(){
         Foo mock = Dymock.burn(Foo.class);
         BonfireBuilder.buildBonfire(mock)
-                .addStick(new Stick("echoInt", 1, Leaf.combine(Leaf.eq(0), Leaf.eq(1))));
+                .addStick(new Stick("echoInt", 1, Leaf.or(Leaf.eq(0), Leaf.eq(1))));
         Assertions.assertEquals(mock.echoInt(0), 1);
         Assertions.assertEquals(mock.echoInt(1), 1);
         Assertions.assertEquals(mock.echoInt(2), 0);
     }
     @Test
+    public void testCompositeAndCondition(){
+        Foo mock = Dymock.burn(Foo.class);
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(new Stick("echoInt", 1, Leaf.and(Leaf.limit().from(0), Leaf.limit().to(1))));
+        Assertions.assertEquals(1, mock.echoInt(0));
+        Assertions.assertEquals(1, mock.echoInt(1));
+        Assertions.assertEquals(0, mock.echoInt(2));
+    }
+    @Test
     public void testEmptyCompositeCondition(){
         Foo mock = Dymock.burn(Foo.class);
         BonfireBuilder.buildBonfire(mock)
-                .addStick(new Stick("echoInt", 1, Leaf.combine()));
+                .addStick(new Stick("echoInt", 1, Leaf.or()));
         Assertions.assertEquals(mock.echoInt(0), 1);
         Assertions.assertEquals(mock.echoInt(12345678), 1);
     }
