@@ -3,11 +3,8 @@ package ru.nsu.fit.dymock;
 import net.bytebuddy.agent.ByteBuddyAgent;
 import ru.nsu.fit.dymock.bytebuddy.*;
 import ru.nsu.fit.dymock.matchers.Stick;
-import ru.nsu.fit.dymock.matchers.LeafMatcher;
 
 import java.lang.reflect.Modifier;
-import java.util.List;
-
 public class Dymock {
     private static final Dymock INSTANCE = new Dymock();
 
@@ -42,14 +39,7 @@ public class Dymock {
         }
         return maker.createStaticMock(classToMock, true);
     }
-    public static <T, R> Stick stick(Class<T> mockedClass, String methodName,
-                                     List<LeafMatcher> matchers, R returnValue) {
-        return null;
-    }
-    public static <T> Stick wetStick(Class<T> mockedClass, String methodName,
-                                     List<LeafMatcher> matchers, Throwable throwable) {
-        return null;
-    }
+
     public static boolean ignited(Object mock) {
         if (mock instanceof InterceptionAccessor
             && ((InterceptionAccessor<?>) mock).getInterceptor().getCountCalls() > 0) {
@@ -109,6 +99,12 @@ public class Dymock {
         if (mock instanceof Intercepted) {
             int calls = StaticInterceptor.getClassRules(((Intercepted<?>) mock).getClazz()).getMethodCountCalls(methodName);
             return basker.fits(calls);
+        }
+        return false;
+    }
+    public static boolean ignited(Object mock, String methodName, Class<?>... arguments) {
+        if (mock instanceof InterceptionAccessor){
+            return ((InterceptionAccessor<?>) mock).getInterceptor().getSignatureCountCalls(methodName, arguments) > 0;
         }
         return false;
     }

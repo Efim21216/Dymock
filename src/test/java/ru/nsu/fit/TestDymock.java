@@ -6,8 +6,6 @@ import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
-import ru.nsu.fit.dymock.matchers.LeafMatcher;
-import ru.nsu.fit.dymock.matchers.LeafMatcher;
 import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
 
@@ -220,5 +218,19 @@ public class TestDymock {
 
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0));
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0, 0));
+    }
+    @Test
+    public void testSignatureCalls() {
+        Foo test = Dymock.burn(Foo.class);
+        test.echoInt(1);
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Integer.class));
+        Assertions.assertFalse(Dymock.ignited(test, "echoInt", Double.class));
+    }
+    @Test
+    public void testSignatureCallsSpy() {
+        Foo test = Dymock.spy(Foo.class);
+        test.echoInt(1);
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Integer.class));
+        Assertions.assertFalse(Dymock.ignited(test, "echoInt", Double.class));
     }
 }

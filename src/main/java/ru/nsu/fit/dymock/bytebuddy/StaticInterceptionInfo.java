@@ -56,7 +56,8 @@ public class StaticInterceptionInfo {
     public void addStick(Stick stick) {
         MethodInterceptionInfo info = mapping.get(stick.getMethodName());
         if (info == null)
-            mapping.put(stick.getMethodName(), new MethodInterceptionInfo(new ArrayList<>(List.of(stick)), new ArrayList<>()));
+            mapping.put(stick.getMethodName(), new MethodInterceptionInfo(new ArrayList<>(List.of(stick)),
+                    new ArrayList<>(), stick.getMethodName()));
         else
             info.addStick(stick);
     }
@@ -64,7 +65,8 @@ public class StaticInterceptionInfo {
         String name = stick.getMethodName();
         MethodInterceptionInfo info = mapping.get(name);
         if (info == null)
-            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(), new ArrayList<>(List.of(stick))));
+            mapping.put(name, new MethodInterceptionInfo(new ArrayList<>(),
+                    new ArrayList<>(List.of(stick)), name));
         else
             info.addPartialStick(stick);
     }
