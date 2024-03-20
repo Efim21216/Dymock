@@ -17,8 +17,13 @@ public class Dymock {
         return maker.createMock(classToMock, false, checkIsFinal(classToMock));
     }
     public static <T> T spy(Class<T> classToSpy) {
-        boolean isFinal = Modifier.isFinal(classToSpy.getModifiers());
         return maker.createMock(classToSpy, true, checkIsFinal(classToSpy));
+    }
+    public static <T> FinalIntercepted<T> burnFinal(Class<T> classToMock) {
+        return maker.createFinalMock(classToMock, false);
+    }
+    public static <T> FinalIntercepted<T> spyFinal(Class<T> classToSpy) {
+        return maker.createFinalMock(classToSpy, true);
     }
     private static <T> boolean checkIsFinal(Class<T> classToMock) {
         boolean isFinal = Modifier.isFinal(classToMock.getModifiers());
@@ -104,6 +109,10 @@ public class Dymock {
     public static boolean ignited(Object mock, String methodName, Basker basker) {
         if (mock instanceof InterceptionAccessor){
             int calls = ((InterceptionAccessor<?>) mock).getInterceptor().getMethodCountCalls(methodName);
+            return basker.fits(calls);
+        }
+        if (mock instanceof FinalIntercepted) {
+            int calls = FinalInterceptor.getObjectRules(((FinalIntercepted<?>) mock).getMock()).getMethodCountCalls(methodName);
             return basker.fits(calls);
         }
         if (mock instanceof Intercepted) {

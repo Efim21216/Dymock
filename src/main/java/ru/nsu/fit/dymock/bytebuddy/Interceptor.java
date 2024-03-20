@@ -40,7 +40,12 @@ public class Interceptor<T> {
         countCalls++;
         String name = invokedMethod.getName();
         MethodInterceptionInfo interceptionInfo = mapping.get(name);
-        if (interceptionInfo != null) {
+        if(interceptionInfo == null){
+            var info = new MethodInterceptionInfo(new ArrayList<>(), new ArrayList<>());
+            info.incrementMethodCallCount();
+            mapping.put(name, info);
+        }
+        else {
             interceptionInfo.incrementMethodCallCount();
             Stick stick = mapping.get(name).getSuitableStick(arguments);
             if (stick != null) {

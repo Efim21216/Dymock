@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
+import ru.nsu.fit.dymock.bytebuddy.FinalIntercepted;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
 import ru.nsu.fit.dymock.matchers.PartialStick;
@@ -31,7 +32,8 @@ public class TestDymock {
     }
     @Test
     public void testFinalEmptyMock() {
-        FinalClass mock = Dymock.burn(FinalClass.class);
+        FinalIntercepted<FinalClass> mockContainter = Dymock.burnFinal(FinalClass.class);
+        FinalClass mock = mockContainter.getMock();
         Assertions.assertFalse(mock.isDivisor(2, 1));
         FinalClass origin = new FinalClass();
         Assertions.assertTrue(origin.isDivisor(2, 1));
@@ -63,7 +65,8 @@ public class TestDymock {
     }
     @Test
     public void testFinalStick() {
-        FinalClass mock = Dymock.burn(FinalClass.class);
+        FinalIntercepted<FinalClass> mockContainter = Dymock.burnFinal(FinalClass.class);
+        FinalClass mock = mockContainter.getMock();
         BonfireBuilder.buildBonfire(mock)
                         .addStick(new Stick("isDivisor", true, Leaf.any(), Leaf.any()));
         Assertions.assertTrue(mock.isDivisor(2, 3));
@@ -218,5 +221,24 @@ public class TestDymock {
 
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0));
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0, 0));
+    }
+    @Test
+    public void testMissedCalls(){
+        Foo mock = Dymock.spy(Foo.class);
+        mock.echoInt(0);
+        mock.echoInt(0.1);
+        mock.echoInt(0, 0);
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(3)));
+
+        Intercepted<StaticMethod> staticMock = Dymock.spyStatic(StaticMethod.class);
+        StaticMethod.plus(0.0, 0.0);
+        StaticMethod.plus(0);
+        StaticMethod.plus(0, 0);
+        Assertions.assertTrue(Dymock.ignited(staticMock, "plus", Dymock.exactly(3)));
+
+        FinalIntercepted<FinalClass> finalMock = Dymock.spyFinal(FinalClass.class);
+        FinalClass finalMockObject = finalMock.getMock();
+        finalMockObject.isDivisor(5, 6);
+        Assertions.assertTrue(Dymock.ignited(finalMock, "isDivisor", Dymock.exactly(1)));
     }
 }
