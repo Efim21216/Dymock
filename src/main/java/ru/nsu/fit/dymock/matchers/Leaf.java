@@ -149,35 +149,35 @@ public class Leaf {
         }
     }
 
-    public static LeafMatcher green(){
+    public static LeafMatcher any(){
         return INSTANCE.new GreenLeaf();
     }
 
-    public static LeafMatcher green(Class<?> clazz){
+    public static LeafMatcher any(Class<?> clazz){
         return INSTANCE.new GreenLeaf(clazz);
     }
 
-    public static LeafMatcher yellow(Object wanted){
+    public static LeafMatcher eq(Object wanted){
         return INSTANCE.new YellowLeaf(wanted);
     }
 
-    public static LeafMatcher yellow(Object wanted, Class<?> clazz){
+    public static LeafMatcher eq(Object wanted, Class<?> clazz){
         return INSTANCE.new YellowLeaf(wanted, clazz);
     }
 
-    public static LeafMatcher red(Object wanted){
+    public static LeafMatcher linkEq(Object wanted){
         return INSTANCE.new RedLeaf(wanted);
     }
 
-    public static LeafMatcher red(Object wanted, Class<?> clazz){
+    public static LeafMatcher linkEq(Object wanted, Class<?> clazz){
         return INSTANCE.new RedLeaf(wanted, clazz);
     }
 
-    public static LeafMatcher fleaf(Number wanted){
+    public static LeafMatcher fpEq(Number wanted){
         return INSTANCE.new FloatingLeaf(wanted);
     }
 
-    public static LeafMatcher fleaf(Number wanted, double threshold){
+    public static LeafMatcher fpEq(Number wanted, double threshold){
         return INSTANCE.new FloatingLeaf(wanted, threshold);
     }
 
