@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
+import ru.nsu.fit.dymock.bytebuddy.FinalIntercepted;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
 import ru.nsu.fit.dymock.matchers.PartialStick;
@@ -90,11 +91,11 @@ public class TestDymock {
         Foo mock = Dymock.burn(Foo.class);
         Foo.Bar arg = new Foo.Bar("Mr");
         BonfireBuilder.buildBonfire(mock)
-                .addStick(new Stick("helloBar", "Green", Leaf.any()))
-                .addStick(new Stick("helloBar", "Yellow", Leaf.eq(arg)))
+                .addStick(new Stick("helloBar", "any", Leaf.any()))
+                .addStick(new Stick("helloBar", "eq", Leaf.eq(arg)))
                 .addStick(new Stick("helloBar", "Red", Leaf.linkEq(arg)));
-        Assertions.assertEquals("Green", mock.helloBar(new Foo.Bar("")));
-        Assertions.assertEquals("Yellow", mock.helloBar(new Foo.Bar("Mr")));
+        Assertions.assertEquals("any", mock.helloBar(new Foo.Bar("")));
+        Assertions.assertEquals("eq", mock.helloBar(new Foo.Bar("Mr")));
         Assertions.assertEquals("Red", mock.helloBar(arg));
     }
     @Test
@@ -102,11 +103,11 @@ public class TestDymock {
         Foo mock = Dymock.spy(Foo.class);
         Foo.Bar arg = new Foo.Bar("Mr");
         BonfireBuilder.buildBonfire(mock)
-                .addStick(new Stick("helloBar", "Green", Leaf.any()))
-                .addStick(new Stick("helloBar", "Yellow", Leaf.eq(arg)))
+                .addStick(new Stick("helloBar", "any", Leaf.any()))
+                .addStick(new Stick("helloBar", "eq", Leaf.eq(arg)))
                 .addStick(new Stick("helloBar", "Red", Leaf.linkEq(arg)));
-        Assertions.assertEquals("Green", mock.helloBar(new Foo.Bar("")));
-        Assertions.assertEquals("Yellow", mock.helloBar(new Foo.Bar("Mr")));
+        Assertions.assertEquals("any", mock.helloBar(new Foo.Bar("")));
+        Assertions.assertEquals("eq", mock.helloBar(new Foo.Bar("Mr")));
         Assertions.assertEquals("Red", mock.helloBar(arg));
         Assertions.assertEquals(12, mock.echoInt(12));
     }
@@ -227,5 +228,93 @@ public class TestDymock {
 
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0));
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0, 0));
+    }
+    @Test
+    public void testSignatureCalls() {
+        Foo test = Dymock.burn(Foo.class);
+        test.echoInt(1);
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Integer.class));
+        Assertions.assertFalse(Dymock.ignited(test, "echoInt", Double.class));
+    }
+    @Test
+    public void testSignatureCallsSpy() {
+        Foo test = Dymock.spy(Foo.class);
+        test.echoInt(1);
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Integer.class));
+        Assertions.assertFalse(Dymock.ignited(test, "echoInt", Double.class));
+    }
+    @Test
+    public void testStaticSignatureCallsSpy() {
+        Intercepted<StaticMethod> test = Dymock.spyStatic(StaticMethod.class);
+        StaticMethod.plus(1, 1);
+        Assertions.assertTrue(Dymock.ignited(test, "plus", Integer.class, Integer.class));
+        Assertions.assertFalse(Dymock.ignited(test, "plus", Double.class));
+    }
+    @Test
+    public void testFinalSignatureCalls() {
+        FinalClass test = Dymock.burn(FinalClass.class);
+        test.echoInt(1);
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Integer.class));
+        Assertions.assertFalse(Dymock.ignited(test, "echoInt", Integer.class, Integer.class));
+    }
+    @Test
+    public void testFinalSignatureAndStickCalls() {
+        FinalClass test = Dymock.burn(FinalClass.class);
+        BonfireBuilder.buildBonfire(test)
+                .addStick(new Stick("echoInt", 0, Leaf.any(Integer.class), Leaf.any(Integer.class)))
+                .addStick(new Stick("echoInt", 0, Leaf.any(Integer.class)));
+        test.echoInt(1);
+        test.echoInt(1, 1);
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Dymock.exactly(1), Integer.class, Integer.class));
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Dymock.exactly(1), Integer.class));
+        Assertions.assertTrue(Dymock.ignited(test, "echoInt", Dymock.exactly(2)));
+    }
+    @Test
+    public void testStaticSignatureAndStickCalls() {
+        Intercepted<StaticMethod> test = Dymock.spyStatic(StaticMethod.class);
+        Stick intStick = new Stick("plus", 0, Leaf.any(Integer.class), Leaf.any(Integer.class));
+        Stick doubleStick = new Stick("plus", 1.1, Leaf.any(Double.class), Leaf.any(Double.class));
+        BonfireBuilder.buildBonfire(test)
+                .addStick(intStick)
+                .addStick(doubleStick);
+        StaticMethod.plus(1, 1);
+        StaticMethod.plus(1.0, 1.0);
+        Assertions.assertTrue(Dymock.ignited(test, "plus", Dymock.exactly(1), Integer.class, Integer.class));
+        Assertions.assertTrue(Dymock.ignited(test, "plus", Dymock.exactly(1), Double.class, Double.class));
+        Assertions.assertTrue(Dymock.ignited(test, "plus", Dymock.exactly(2)));
+    }
+    @Test
+    public void testSignatureAndSticks() {
+        Foo mock = Dymock.burn(Foo.class);
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(new Stick("echoInt", 2, Leaf.eq(1)))
+                .addStick(new Stick("echoInt", 2, Leaf.eq(1), Leaf.eq(1)))
+                .addStick(new Stick("echoInt", 3, Leaf.eq(1.0)));
+        mock.echoInt(1);
+        mock.echoInt(1, 1);
+        mock.echoInt(1.0);
+
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(3)));
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(1), Integer.class));
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(1), Double.class));
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(1), Integer.class, Integer.class));
+    }
+    @Test
+    public void testMissedCalls(){
+        Foo mock = Dymock.spy(Foo.class);
+        mock.echoInt(0);
+        mock.echoInt(0.1);
+        mock.echoInt(0, 0);
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(3)));
+
+        Intercepted<StaticMethod> staticMock = Dymock.spyStatic(StaticMethod.class);
+        StaticMethod.plus(0.0, 0.0);
+        StaticMethod.plus(0);
+        StaticMethod.plus(0, 0);
+        Assertions.assertTrue(Dymock.ignited(staticMock, "plus", Dymock.exactly(3)));
+
+        FinalClass finalMock = Dymock.spy(FinalClass.class);
+        finalMock.isDivisor(5, 6);
+        Assertions.assertTrue(Dymock.ignited(finalMock, "isDivisor", Dymock.exactly(1)));
     }
 }
