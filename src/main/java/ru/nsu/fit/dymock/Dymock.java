@@ -212,4 +212,7 @@ public class Dymock {
         basker.high = high;
         return basker;
     }
+    public static Class<?>[] emptyArgs() {
+        return new Class[0];
+    }
 }

@@ -329,4 +329,10 @@ public class TestDymock {
         finalMock.isDivisor(5, 6);
         Assertions.assertTrue(Dymock.ignited(finalMock, "isDivisor", Dymock.exactly(1)));
     }
+    @Test
+    public void testEmptyCallCounting() {
+        Foo mock = Dymock.burn(Foo.class);
+        mock.returnInt();
+        Assertions.assertTrue(Dymock.ignited(mock, "returnInt", Dymock.emptyArgs()));
+    }
 }
