@@ -45,6 +45,8 @@ public class Demo {
                 //linkEq - сравнение по ссылке
                 .addStick(new Stick("echoDouble", 20.0, Leaf.linkEq(d)));
 
+        //Порядок применения пересекающихся правил на аргументы:
+        //От последнего заданного к наиболее ранее заданному
         Assertions.assertEquals(1.0, helloWorld.echoDouble(1.0));
         Assertions.assertEquals(20.0, helloWorld.echoDouble(d));
         Assertions.assertEquals(2.0, helloWorld.echoDouble(2.0));
@@ -75,6 +77,7 @@ public class Demo {
 
 
         //Есть возможность частичного задания аргументов
+        //Такие правила будут применены ко всем перегруженным функциям, чьи аргументы удовлетворяют условию
         //Для этого нужно указать название аргумента и его значение
         //Leaf.partial(String parameterName, LeafMatcher matcher)
         BonfireBuilder.buildBonfire(helloWorld)
