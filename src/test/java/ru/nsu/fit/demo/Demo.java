@@ -1,9 +1,13 @@
 package ru.nsu.fit.demo;
 
+import java.math.BigInteger;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
+import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
 import ru.nsu.fit.dymock.matchers.PartialStick;
 import ru.nsu.fit.dymock.matchers.Stick;
@@ -133,4 +137,77 @@ public class Demo {
         Assertions.assertTrue(stick.bask(Dymock.exactly(2)));
     }
 
+    @Test
+    void demoStaticAndFinal() {
+        //Final и Static классы похожы тем, что нельзя 
+        //наследоваться от них, переопределив необходимые методы
+
+        //Тем не менее, все описанные операции можно проделывать с ними
+        //В случае статичного класса пользователи могут получить объекта 
+        //класса Intercepted<>, чтобы управлять и проверять поведения мока 
+        Intercepted<AddOperations> mock = Dymock.burnDown(AddOperations.class);
+        Stick intStick = new Stick("add", 1, Leaf.any(Integer.class), Leaf.any(Integer.class));
+        Stick doubleStick = new Stick("add", 1.1, Leaf.any(Double.class), Leaf.any(Double.class));
+        BigInteger bigIntValue = BigInteger.valueOf(1);
+        Stick bigIntStick = new Stick("add", bigIntValue, Leaf.eq(bigIntValue), Leaf.eq(bigIntValue));
+
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(intStick)
+                .addStick(doubleStick)
+                .addStick(bigIntStick);
+
+
+        //Вызовы происходят как обычно
+        Assertions.assertEquals(1, AddOperations.add(1,1));
+        Assertions.assertEquals(1.1, AddOperations.add(1.,1.));
+        Assertions.assertEquals(BigInteger.valueOf(1), AddOperations.add(bigIntValue,bigIntValue));
+        
+
+        //Проверка числа вызовов также аналогична
+        Assertions.assertTrue(Dymock.ignited(mock, "add", Dymock.exactly(1), Integer.class, Integer.class));
+        Assertions.assertTrue(Dymock.ignited(mock, "add", Dymock.exactly(1), Double.class, Double.class));
+        Assertions.assertTrue(Dymock.ignited(mock, "add", Dymock.exactly(3)));
+
+
+        //Мок Final тоже работает, ничем не отличаясь от обычной процедуры 
+        Rectangle mockFinal = Dymock.burn(Rectangle.class);
+        BonfireBuilder.buildBonfire(mockFinal)
+                .addStick(new Stick("area", 100));
+        
+        mockFinal.setHeight(0);
+        mockFinal.setWidth(0);
+        Assertions.assertEquals(100, mockFinal.area());
+        Assertions.assertTrue(Dymock.ignited(mockFinal, "area"));
+    }
+
+    @Test
+    void demoSpy(){
+        //Если мы хотим сохранить поведение объекта или класса,
+        //но изменить в нём конкретные детали - используем spy
+        CallCounting mockFinal = Dymock.spy(CallCounting.class);
+        BonfireBuilder.buildBonfire(mockFinal)
+                .addStick(new Stick("echoInt", 100, Leaf.any()))
+        //Задаём условие на конкретные аргументы, для всех остальных значений, поведение не изменится
+                .addStick(new Stick("echoInt", 2, Leaf.eq(0), Leaf.eq(0)));
+        
+        Assertions.assertEquals(100, mockFinal.echoInt(1));
+        Assertions.assertEquals(2, mockFinal.echoInt(0, 0));
+        Assertions.assertEquals(20, mockFinal.echoInt(10, 10));
+
+
+        //Даже если наш вызов не удовлетворил ни одному их условий (stick),
+        //этот вызов учтётся при подсчёте общего числа
+        Assertions.assertTrue(Dymock.ignited(mockFinal, "echoInt", Dymock.exactly(3)));
+
+
+        //Статичные классы также можно не "разрушать"
+        Intercepted<AddOperations> mockStatic = Dymock.spyStatic(AddOperations.class);
+
+        BonfireBuilder.buildBonfire(mockStatic)
+        //Добавляем правило для сложения только целых чисел 
+                .addStick(new Stick("add", 1, Leaf.any(Integer.class), Leaf.any(Integer.class)));
+        
+        Assertions.assertEquals(1, AddOperations.add(1,1));
+        Assertions.assertEquals(2, AddOperations.add(1.,1.));
+    }
 }
