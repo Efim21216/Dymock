@@ -141,15 +141,19 @@ public class Demo {
 
     @Test
     void demoStaticAndFinal() {
-        //Final и Static классы похожы тем, что нельзя 
+        //Final классы и классы со Static методами похожы тем, что нельзя 
         //наследоваться от них, переопределив необходимые методы
 
         //Тем не менее, все описанные операции можно проделывать с ними
-        //В случае статичного класса пользователи могут получить объекта 
+        //В случае класса со статичным методов пользователи могут получить объекта 
         //класса Intercepted<>, чтобы управлять и проверять поведения мока 
         Intercepted<AddOperations> mock = Dymock.burnDown(AddOperations.class);
+
+        //Правила сложения для целых чисел
         Stick intStick = new Stick("add", 1, Leaf.any(Integer.class), Leaf.any(Integer.class));
+        //чисел c плавающей точкой 
         Stick doubleStick = new Stick("add", 1.1, Leaf.any(Double.class), Leaf.any(Double.class));
+        //и bigInteger
         BigInteger bigIntValue = BigInteger.valueOf(1);
         Stick bigIntStick = new Stick("add", bigIntValue, Leaf.eq(bigIntValue), Leaf.eq(bigIntValue));
 
@@ -188,8 +192,9 @@ public class Demo {
         //но изменить в нём конкретные детали - используем spy
         CallCounting mockFinal = Dymock.spy(CallCounting.class);
         BonfireBuilder.buildBonfire(mockFinal)
+        //Задаём условие на все вызовы с одним аргументом
                 .addStick(new Stick("echoInt", 100, Leaf.any()))
-        //Задаём условие на конкретные аргументы, для всех остальных значений, поведение не изменится
+        //Задаём условие на конкретные аргументы. Для всех остальных значений, поведение не изменится
                 .addStick(new Stick("echoInt", 2, Leaf.eq(0), Leaf.eq(0)));
         
         Assertions.assertEquals(100, mockFinal.echoInt(1));
@@ -202,7 +207,7 @@ public class Demo {
         Assertions.assertTrue(Dymock.ignited(mockFinal, "echoInt", Dymock.exactly(3)));
 
 
-        //Статичные классы также можно не "разрушать"
+        //Классы со статичными методами также можно не "разрушать"
         Intercepted<AddOperations> mockStatic = Dymock.spyStatic(AddOperations.class);
 
         BonfireBuilder.buildBonfire(mockStatic)
