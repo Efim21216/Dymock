@@ -77,17 +77,11 @@ public class Leaf {
     }
     
     public class LimitLeaf extends LeafMatcher{
-        private double THRESHOLD = .0001;
         private double lo_limit = -Double.MAX_VALUE;
         private double hi_limit = Double.MAX_VALUE;
 
         public LimitLeaf(){
             super(Number.class);
-        }
-
-        public LimitLeaf(double threshold){
-            super(Number.class);
-            this.THRESHOLD = threshold;
         }
 
         public LimitLeaf from(double min){
@@ -104,8 +98,8 @@ public class Leaf {
         public boolean matches(Object actual) {
             double value = ((Number) actual).doubleValue();
             return super.matches(actual) 
-            && value - this.lo_limit + 1 > this.THRESHOLD 
-            && this.hi_limit - value + 1> this.THRESHOLD;
+            && this.lo_limit <= value 
+            && value <= this.hi_limit;
         }
     }
 
@@ -201,12 +195,11 @@ public class Leaf {
         return INSTANCE.new FloatingLeaf(wanted, threshold);
     }
 
+    /**
+     * Create list that checks if argument is within (-inf, a], [a,b] or [b, inf) boundaries
+     */
     public static LimitLeaf limit(){
         return INSTANCE.new LimitLeaf();
-    }
-
-    public static LimitLeaf limit(double threshold){
-        return INSTANCE.new LimitLeaf(threshold);
     }
 
     public static PartialLeaf partial(String paramName, LeafMatcher matcher){

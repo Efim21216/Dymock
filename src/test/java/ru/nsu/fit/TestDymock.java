@@ -148,7 +148,7 @@ public class TestDymock {
         Assertions.assertEquals(1, mock.echoInt(0));
         Assertions.assertEquals(1, mock.echoInt(1));
         Assertions.assertEquals(0, mock.echoInt(2));
-        Assertions.assertEquals(0, mock.echoInt(10));
+        Assertions.assertEquals(1, mock.echoInt(10));
     }
     @Test
     public void testEmptyCompositeCondition(){
