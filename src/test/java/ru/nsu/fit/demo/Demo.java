@@ -115,8 +115,19 @@ public class Demo {
         Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(1)));
 
         //Можно отслеживать вызовы по сигнатуре метода
-        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(1), new Class[0]));
+        //emptyArgs - если у метода нет аргументов
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(1), Dymock.emptyArgs()));
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(0), int.class));
+        Assertions.assertTrue(Dymock.ignited(mock, "echoInt", Dymock.exactly(0), int.class, int.class));
 
+        //Кроме того, вызовы можно посчитать у конкретного Stick
+        Stick stick = new Stick("echoInt", 2, Leaf.any());
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(stick);
+        mock.echoInt(2);
+        mock.echoInt(2.0);
+
+        Assertions.assertTrue(stick.bask(Dymock.exactly(2)));
     }
 
 }
