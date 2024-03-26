@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import ru.nsu.fit.dymock.BonfireBuilder;
 import ru.nsu.fit.dymock.Dymock;
-import ru.nsu.fit.dymock.bytebuddy.FinalIntercepted;
 import ru.nsu.fit.dymock.bytebuddy.Intercepted;
 import ru.nsu.fit.dymock.matchers.Leaf;
 import ru.nsu.fit.dymock.matchers.PartialStick;
@@ -137,6 +136,19 @@ public class TestDymock {
         Assertions.assertEquals(1, mock.echoInt(0));
         Assertions.assertEquals(1, mock.echoInt(1));
         Assertions.assertEquals(0, mock.echoInt(2));
+    }
+    @Test
+    public void testNestedCondition(){
+        Foo mock = Dymock.burn(Foo.class);
+        BonfireBuilder.buildBonfire(mock)
+                .addStick(new Stick("echoInt", 1, Leaf.or(
+                        Leaf.and(Leaf.limit().from(0), Leaf.limit().to(1)),
+                        Leaf.and(Leaf.limit().from(10), Leaf.limit().to(11)))
+                ));
+        Assertions.assertEquals(1, mock.echoInt(0));
+        Assertions.assertEquals(1, mock.echoInt(1));
+        Assertions.assertEquals(0, mock.echoInt(2));
+        Assertions.assertEquals(0, mock.echoInt(10));
     }
     @Test
     public void testEmptyCompositeCondition(){
