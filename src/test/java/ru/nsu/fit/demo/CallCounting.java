@@ -7,6 +7,9 @@ public class CallCounting {
     public int echoInt(int a) {
         return a;
     }
+    public int echoInt(double a) {
+        return (int) a;
+    }
     public int echoInt(int a, int b) {
         return a + b;
     }
