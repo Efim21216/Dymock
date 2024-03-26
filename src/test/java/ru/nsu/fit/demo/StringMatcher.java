@@ -7,8 +7,8 @@ public class StringMatcher extends LeafMatcher{
 
     //Конструктор может быть любым
     public StringMatcher(String badChars){
-        //Необходимо вызвать конструктор LeafMatcher, проверяющий тип аргумента
-        //Если проверять тип не нужно нужно написать super(Object.class);
+        //Можно вызвать конструктор LeafMatcher,
+        //Если хочется указать тип аргумента
         super(String.class);
         this.badChars = badChars;
     }
