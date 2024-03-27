@@ -87,7 +87,7 @@ public class Demo {
         //Для этого нужно указать название аргумента и его значение
         //Leaf.partial(String parameterName, LeafMatcher matcher)
         BonfireBuilder.buildBonfire(helloWorld)
-                .addStick(new PartialStick("concat", "B is important", Leaf.partial("b", Leaf.eq("param2"))));
+                .addPartialStick(new PartialStick("concat", "B is important", Leaf.partial("b", Leaf.eq("param2"))));
         Assertions.assertEquals("B is important", helloWorld.concat("any argument here", "param2"));
 
         //Если и этого не достаточно, то есть возможность создать свой Matcher
