@@ -7,7 +7,6 @@ public class Leaf {
 
     private class GreenLeaf extends LeafMatcher{
         public GreenLeaf(){
-            super(Object.class);
         }
         public GreenLeaf(Class<?> argType){
             super(argType);
@@ -27,7 +26,6 @@ public class Leaf {
         }
     
         public YellowLeaf(Object wanted){
-            super(wanted.getClass());
             this.wanted = wanted;
         }
     
@@ -46,7 +44,6 @@ public class Leaf {
         }
     
         public RedLeaf(Object wanted){
-            super(wanted.getClass());
             this.wanted = wanted;
         }        
         public RedLeaf(Object wanted, Class<?> argType){
@@ -106,7 +103,6 @@ public class Leaf {
     private class CompositeOrLeaf extends LeafMatcher{
         private LeafMatcher[] matchers;
         public CompositeOrLeaf(LeafMatcher... matchers){
-            super(Object.class);
             this.matchers = Arrays.copyOf(matchers, matchers.length);
         }
 
@@ -126,7 +122,6 @@ public class Leaf {
     private class CompositeAndLeaf extends LeafMatcher{
         private LeafMatcher[] matchers;
         public CompositeAndLeaf(LeafMatcher... matchers){
-            super(Object.class);
             this.matchers = Arrays.copyOf(matchers, matchers.length);
         }
 

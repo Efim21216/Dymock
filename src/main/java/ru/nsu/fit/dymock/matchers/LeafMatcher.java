@@ -5,6 +5,9 @@ public class LeafMatcher {
     public LeafMatcher(Class<?> argType){
         this.argType = argType;
     }
+    public LeafMatcher(){
+        this.argType = Object.class;
+    }
 
     public boolean matches(Object actual){
         return this.argType.isInstance(actual);
