@@ -182,9 +182,9 @@ public class TestDymock {
 
         Foo anotherMock = Dymock.burn(Foo.class);
         Assertions.assertFalse(Dymock.ignited(anotherMock, intStick));
-        Assertions.assertTrue(Dymock.ignited(mock, intStick));
+        Assertions.assertTrue(Dymock.ignited(mock, intStick, Dymock.exactly(2)));
         Assertions.assertFalse(Dymock.ignited(anotherMock, doubleStick));
-        Assertions.assertTrue(Dymock.ignited(mock, doubleStick));
+        Assertions.assertTrue(Dymock.ignited(mock, doubleStick, Dymock.atMost(2)));
         Assertions.assertFalse(Dymock.ignited(anotherMock, twoArgsStick));
         Assertions.assertTrue(Dymock.ignited(mock, twoArgsStick));
     }
