@@ -217,4 +217,25 @@ public class Demo {
         Assertions.assertEquals(1, AddOperations.add(1,1));
         Assertions.assertEquals(2, AddOperations.add(1.,1.));
     }
+
+    @Test
+    void demoCustomLeaf(){
+        //Матчер, который ищет, есть ли в переданной строке "плохие" символы
+        HelloWorld helloWorld = Dymock.spy(HelloWorld.class);
+        String result = "Unsupported numbers";
+        BonfireBuilder.buildBonfire(helloWorld)
+                .addStick(new Stick("concat", result,
+                        //Задаём правило, когда в первом аргументе числа
+                        new StringMatcher("1234567890"), 
+                        Leaf.any()))
+                .addStick(new Stick("concat", result,
+                        Leaf.any(), 
+                        //Задаём правило, когда во втором аргументе числа
+                        new StringMatcher("1234567890")));
+
+                        
+        Assertions.assertEquals("ab", helloWorld.concat("a", "b"));
+        Assertions.assertEquals(result, helloWorld.concat("a2", "b"));
+        Assertions.assertEquals(result, helloWorld.concat("a", "b2"));
+    }
 }
