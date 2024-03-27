@@ -226,8 +226,8 @@ public class TestDymock {
         PartialStick firstArgStick = new PartialStick("echoInt", 1, Leaf.partial("a", Leaf.eq(1)));
         PartialStick secondArgStick = new PartialStick("echoInt", 2, Leaf.partial("b", Leaf.eq(1)));
         BonfireBuilder.buildBonfire(mock)
-            .addPartialStick(firstArgStick)
-            .addPartialStick(secondArgStick);
+            .addStick(firstArgStick)
+            .addStick(secondArgStick);
         Assertions.assertEquals(1, mock.echoInt(1));
         Assertions.assertEquals(1, mock.echoInt(1, 0));
         Assertions.assertEquals(2, mock.echoInt(1, 1));
@@ -236,7 +236,7 @@ public class TestDymock {
     public void testPartialStatic(){
         Intercepted<StaticMethod> mock = Dymock.burnDown(StaticMethod.class);
         PartialStick doubleStick = new PartialStick("plus", 1.1, Leaf.partial("a", Leaf.eq(1.0)));
-        BonfireBuilder.buildBonfire(mock).addPartialStick(doubleStick);
+        BonfireBuilder.buildBonfire(mock).addStick(doubleStick);
 
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0));
         Assertions.assertEquals(1.1, StaticMethod.plus(1.0, 0));

@@ -25,6 +25,14 @@ public class BonfireBuilder {
             this.current = mock;
         }
         public Builder addStick(Stick stick) {
+            if(stick instanceof PartialStick){
+                return addPartialStick((PartialStick)stick);
+            }
+            else{
+                return addRegularStick(stick);
+            }
+        }
+        private Builder addRegularStick(Stick stick){
             if (current instanceof Intercepted) {
                 StaticInterceptor.addStick(stick, ((Intercepted<?>) current).getClazz());
             }
@@ -36,8 +44,7 @@ public class BonfireBuilder {
 
             return this;
         }
-
-        public Builder addPartialStick(PartialStick stick) {
+        private Builder addPartialStick(PartialStick stick) {
             if (current instanceof Intercepted) {
                 StaticInterceptor.addPartialStick(stick, ((Intercepted<?>) current).getClazz());
             }
