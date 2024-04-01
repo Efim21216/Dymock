@@ -335,4 +335,18 @@ public class TestDymock {
         mock.returnInt();
         Assertions.assertTrue(Dymock.ignited(mock, "returnInt", Dymock.emptyArgs()));
     }
+    @Test
+    public void testStickInSeveralObjects() {
+        Foo mock1 = Dymock.burn(Foo.class);
+        StringFoo mock2 = Dymock.burn(StringFoo.class);
+
+        Stick stick = new Stick("echoInt", 1, Leaf.any());
+        BonfireBuilder.buildBonfire(mock1)
+                .addStick(stick);
+        BonfireBuilder.buildBonfire(mock2)
+                .addStick(stick);
+        mock1.echoInt(1);
+        mock2.echoInt("");
+        Assertions.assertTrue(stick.bask(Dymock.exactly(2)));
+    }
 }
